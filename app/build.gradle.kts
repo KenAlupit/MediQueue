@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle.v110)
     implementation(libs.androidx.camera.view)
     implementation(libs.guava)
+    implementation(libs.libphonenumber)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)

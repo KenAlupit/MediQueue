@@ -1,0 +1,286 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Full Name" />
+        <EditText
+            android:id="@+id/fullName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Full Name" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Date of Birth (YYYY-MM-DD)" />
+        <EditText
+            android:id="@+id/dateOfBirth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Date of Birth (YYYY-MM-DD)"
+            android:focusable="false" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sex" />
+        <RadioGroup
+            android:id="@+id/sexGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:id="@+id/sexMale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Male" />
+            <RadioButton
+                android:id="@+id/sexFemale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Phone Number" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Country Code" />
+
+        <Spinner
+            android:id="@+id/countryCodeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <EditText
+            android:id="@+id/phoneNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Phone Number"
+            android:inputType="phone" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Email (Optional)" />
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email (Optional)"
+            android:inputType="textEmailAddress" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Address" />
+        <EditText
+            android:id="@+id/address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Address" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Emergency Contact Name" />
+        <EditText
+            android:id="@+id/emergencyName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Emergency Contact Name" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Emergency Contact Relationship" />
+        <EditText
+            android:id="@+id/emergencyRelationship"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Emergency Contact Relationship" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Emergency Contact Phone" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Country Code" />
+        <Spinner
+            android:id="@+id/emergencyCountryCodeSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <EditText
+            android:id="@+id/emergencyPhone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Emergency Contact Phone"
+            android:inputType="phone" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Medications (comma-separated)" />
+        <EditText
+            android:id="@+id/medications"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Medications (comma-separated)" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Allergies (comma-separated)" />
+        <EditText
+            android:id="@+id/allergies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Allergies (comma-separated)" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Conditions (comma-separated)" />
+        <EditText
+            android:id="@+id/conditions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Conditions (comma-separated)" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Past Surgeries (comma-separated)" />
+        <EditText
+            android:id="@+id/surgeries"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Past Surgeries (comma-separated)" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Reason for Visit" />
+        <EditText
+            android:id="@+id/visitReason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Reason for Visit" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Symptoms" />
+        <EditText
+            android:id="@+id/symptoms"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Symptoms" />
+
+        <TextView
+            android:id="@+id/painLevelLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pain Level: 0" />
+
+        <SeekBar
+            android:id="@+id/painLevel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="10" />
+
+        <CheckBox
+            android:id="@+id/recentTravel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recent Travel History" />
+
+        <CheckBox
+            android:id="@+id/recentExposure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recent Exposure to Illness" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Smoking Frequency (e.g., None, Occasionally, Daily)" />
+        <EditText
+            android:id="@+id/smoking"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Smoking Frequency (e.g., None, Occasionally, Daily)" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Alcohol Use (e.g., None, Occasionally, Daily)" />
+        <EditText
+            android:id="@+id/alcohol"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Alcohol Use (e.g., None, Occasionally, Daily)" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Exercise Frequency (e.g., None, Weekly, Daily)" />
+        <EditText
+            android:id="@+id/exercise"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Exercise Frequency (e.g., None, Weekly, Daily)" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Dietary Restrictions" />
+        <EditText
+            android:id="@+id/diet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Dietary Restrictions" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Insurance Provider" />
+        <EditText
+            android:id="@+id/insuranceProvider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Insurance Provider" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Policy Number" />
+        <EditText
+            android:id="@+id/policyNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Policy Number" />
+
+        <Button
+            android:id="@+id/submitButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Submit" />
+
+    </LinearLayout>
+</ScrollView>
