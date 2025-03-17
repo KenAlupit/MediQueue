@@ -1,0 +1,21 @@
+<!-- res/layout/activity_patient_type_selection.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <Button
+        android:id="@+id/btnOldPatient"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Old Patient" />
+
+    <Button
+        android:id="@+id/btnNewPatient"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Patient"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
