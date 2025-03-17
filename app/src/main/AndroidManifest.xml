@@ -18,6 +18,7 @@
         <activity android:name=".patient.QrScanActivity"/>
         <activity android:name=".patient.PatientTypeSelectionActivity"/>
         <activity android:name=".patient.NewPatientActivity"/>
+        <activity android:name=".patient.OldPatientActivity"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">

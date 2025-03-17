@@ -91,6 +91,11 @@ class NewPatientActivity : AppCompatActivity() {
                 // Do nothing
             }
         }
+
+        val patientId = intent.getStringExtra("PATIENT_ID")
+        if (patientId != null) {
+            prefillPatientData(patientId)
+        }
     }
 
     private fun showDatePicker() {
@@ -108,6 +113,64 @@ class NewPatientActivity : AppCompatActivity() {
         }, year, month, day)
 
         datePicker.show()
+    }
+
+    private fun prefillPatientData(patientId: String) {
+        db.collection("patients").document(patientId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val phoneNumberUtil = PhoneNumberUtil.getInstance()
+
+                    val phoneNumber = document.getString("phone_number")
+                    val emergencyPhoneNumber = document.getString("emergency_contact_phone")
+
+                    if (phoneNumber != null) {
+                        val numberProto = phoneNumberUtil.parse(phoneNumber, null)
+                        val nationalNumber = phoneNumberUtil.format(numberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL)
+                        findViewById<EditText>(R.id.phoneNumber).setText(nationalNumber?.replace(" ", ""))
+                    }
+
+                    if (emergencyPhoneNumber != null) {
+                        val emergencyNumberProto = phoneNumberUtil.parse(emergencyPhoneNumber, null)
+                        val emergencyNationalNumber = phoneNumberUtil.format(emergencyNumberProto, PhoneNumberUtil.PhoneNumberFormat.NATIONAL)
+                        findViewById<EditText>(R.id.emergencyPhone).setText(emergencyNationalNumber?.replace(" ", ""))
+                    }
+
+                    findViewById<EditText>(R.id.fullName).setText(document.getString("full_name"))
+                    findViewById<EditText>(R.id.email).setText(document.getString("email"))
+                    findViewById<EditText>(R.id.address).setText(document.getString("address"))
+                    findViewById<EditText>(R.id.emergencyName).setText(document.getString("emergency_contact_name"))
+                    findViewById<EditText>(R.id.emergencyRelationship).setText(document.getString("emergency_contact_relationship"))
+                    findViewById<EditText>(R.id.medications).setText(document.getString("medications"))
+                    findViewById<EditText>(R.id.allergies).setText(document.getString("allergies"))
+                    findViewById<EditText>(R.id.conditions).setText(document.getString("conditions"))
+                    findViewById<EditText>(R.id.surgeries).setText(document.getString("surgeries"))
+                    findViewById<EditText>(R.id.smoking).setText(document.getString("smoking"))
+                    findViewById<EditText>(R.id.alcohol).setText(document.getString("alcohol"))
+                    findViewById<EditText>(R.id.exercise).setText(document.getString("exercise"))
+                    findViewById<EditText>(R.id.diet).setText(document.getString("diet"))
+                    findViewById<EditText>(R.id.insuranceProvider).setText(document.getString("insurance_provider"))
+                    findViewById<EditText>(R.id.policyNumber).setText(document.getString("policy_number"))
+
+                    // Set gender radio button
+                    when (document.getString("gender")) {
+                        "Male" -> findViewById<RadioButton>(R.id.sexMale).isChecked = true
+                        "Female" -> findViewById<RadioButton>(R.id.sexFemale).isChecked = true
+                    }
+
+                    // Set date of birth
+                    val dateOfBirth = document.getTimestamp("date_of_birth")
+                    if (dateOfBirth != null) {
+                        val calendar = Calendar.getInstance()
+                        calendar.time = dateOfBirth.toDate()
+                        selectedDate = dateOfBirth
+                        dateOfBirthField.setText("${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH) + 1}-${calendar.get(Calendar.DAY_OF_MONTH)}")
+                    }
+                }
+            }
+            .addOnFailureListener {
+                // Handle the error
+            }
     }
 
     private fun savePatientData() {
@@ -231,14 +294,22 @@ class NewPatientActivity : AppCompatActivity() {
             "diet" to findViewById<EditText>(R.id.diet).text.toString(),
             "insurance_provider" to findViewById<EditText>(R.id.insuranceProvider).text.toString(),
             "policy_number" to findViewById<EditText>(R.id.policyNumber).text.toString(),
-            "date_added" to Timestamp.now()
+            "date_updated" to Timestamp.now()
         )
 
-        generateUniquePatientId { patientId ->
-            patientData["patient_id"] = patientId
-            db.collection("patients").add(patientData)
-                .addOnSuccessListener { showToast("Patient Registered!") }
-                .addOnFailureListener { showToast("Error saving data") }
+        val patientId = intent.getStringExtra("PATIENT_ID")
+        if (patientId != null) {
+            db.collection("patients").document(patientId).set(patientData)
+                .addOnSuccessListener { showToast("Patient data updated!") }
+                .addOnFailureListener { showToast("Error updating data") }
+        } else {
+            patientData["date_added"] = Timestamp.now()
+            generateUniquePatientId { newPatientId ->
+                patientData["patient_id"] = newPatientId
+                db.collection("patients").document(newPatientId).set(patientData)
+                    .addOnSuccessListener { showToast("Patient Registered!") }
+                    .addOnFailureListener { showToast("Error saving data") }
+            }
         }
     }
 
