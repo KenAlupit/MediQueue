@@ -10,6 +10,7 @@ import com.ciit.mediqueue.patient.QrScanActivity
 import com.ciit.mediqueue.receptionist.LoginActivity
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

@@ -1,6 +1,7 @@
 package com.ciit.mediqueue.patient
 
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -8,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.ciit.mediqueue.R
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.SetOptions
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 import java.util.*
 
@@ -273,44 +276,119 @@ class NewPatientActivity : AppCompatActivity() {
             "full_name" to fullName,
             "date_of_birth" to selectedDate,
             "gender" to gender,
-            "phone_number" to countryCode + phoneNumber,
+            "phone_number" to "$countryCode$phoneNumber",
             "email" to email,
             "address" to address,
             "emergency_contact_name" to emergencyName,
-            "emergency_contact_relationship" to findViewById<EditText>(R.id.emergencyRelationship).text.toString(),
-            "emergency_contact_phone" to countryCode + emergencyPhone,
+            "emergency_contact_relationship" to findViewById<EditText>(R.id.emergencyRelationship).text.toString().trim(),
+            "emergency_contact_phone" to "$countryCode$emergencyPhone",
             "medications" to medications,
             "allergies" to allergies,
             "conditions" to conditions,
             "surgeries" to surgeries,
-            "reason_for_visit" to visitReason,
-            "symptoms" to symptoms,
-            "pain_level" to findViewById<SeekBar>(R.id.painLevel).progress,
-            "recent_travel_history" to findViewById<CheckBox>(R.id.recentTravel).isChecked,
-            "recent_exposure" to findViewById<CheckBox>(R.id.recentExposure).isChecked,
-            "smoking" to findViewById<EditText>(R.id.smoking).text.toString(),
-            "alcohol" to findViewById<EditText>(R.id.alcohol).text.toString(),
-            "exercise" to findViewById<EditText>(R.id.exercise).text.toString(),
-            "diet" to findViewById<EditText>(R.id.diet).text.toString(),
-            "insurance_provider" to findViewById<EditText>(R.id.insuranceProvider).text.toString(),
-            "policy_number" to findViewById<EditText>(R.id.policyNumber).text.toString(),
+            "smoking" to findViewById<EditText>(R.id.smoking).text.toString().trim(),
+            "alcohol" to findViewById<EditText>(R.id.alcohol).text.toString().trim(),
+            "exercise" to findViewById<EditText>(R.id.exercise).text.toString().trim(),
+            "diet" to findViewById<EditText>(R.id.diet).text.toString().trim(),
+            "insurance_provider" to findViewById<EditText>(R.id.insuranceProvider).text.toString().trim(),
+            "policy_number" to findViewById<EditText>(R.id.policyNumber).text.toString().trim(),
             "date_updated" to Timestamp.now()
         )
 
+        val visitData = hashMapOf(
+            "visit_date" to Timestamp.now(),
+            "patient_id" to "",
+            "reason_for_visit" to visitReason,
+            "symptoms" to symptoms.split(",").map { it.trim() },
+            "pain_level" to findViewById<SeekBar>(R.id.painLevel).progress,
+            "recent_travel_history" to findViewById<CheckBox>(R.id.recentTravel).isChecked,
+            "recent_exposure" to findViewById<CheckBox>(R.id.recentExposure).isChecked,
+            "doctor_notes" to "",
+            "treatment_plan" to "",
+            "status" to "Pending"
+        )
+
         val patientId = intent.getStringExtra("PATIENT_ID")
+
         if (patientId != null) {
-            db.collection("patients").document(patientId).set(patientData)
-                .addOnSuccessListener { showToast("Patient data updated!") }
-                .addOnFailureListener { showToast("Error updating data") }
+            visitData["patient_id"] = patientId
+
+            val batch = db.batch()
+            val patientRef = db.collection("patients").document(patientId)
+            val visitRef = db.collection("medical_visits").document()
+
+            batch.set(patientRef, patientData, SetOptions.merge())
+            batch.set(visitRef, visitData)
+
+            batch.commit()
+                .addOnSuccessListener {
+                    addToQueue(patientId) // Add to queue after saving
+                    showToast("Patient data updated and visit recorded!")
+                }
+                .addOnFailureListener { showToast("Error updating records") }
         } else {
-            patientData["date_added"] = Timestamp.now()
             generateUniquePatientId { newPatientId ->
                 patientData["patient_id"] = newPatientId
-                db.collection("patients").document(newPatientId).set(patientData)
-                    .addOnSuccessListener { showToast("Patient Registered!") }
+                visitData["patient_id"] = newPatientId
+
+                val batch = db.batch()
+                val patientRef = db.collection("patients").document(newPatientId)
+                val visitRef = db.collection("medical_visits").document()
+
+                batch.set(patientRef, patientData)
+                batch.set(visitRef, visitData)
+
+                batch.commit()
+                    .addOnSuccessListener {
+                        addToQueue(newPatientId) // Add to queue after saving
+                        showToast("New Patient Registered and Visit Recorded!")
+                    }
                     .addOnFailureListener { showToast("Error saving data") }
             }
         }
+    }
+
+    private fun addToQueue(patientId: String) {
+        val queueRef = db.collection("queues")
+
+        // Get the latest number_in_line
+        queueRef.orderBy("number_in_line", Query.Direction.DESCENDING)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { documents ->
+                val lastNumber = if (documents.isEmpty) 0 else documents.documents[0].getLong("number_in_line") ?: 0
+                val newQueueData = hashMapOf(
+                    "patient_id" to patientId,
+                    "number_in_line" to lastNumber + 1,
+                    "status" to "Pending",
+                    "date_added" to Timestamp.now(),
+                    "last_updated" to Timestamp.now()
+                )
+
+                queueRef.add(newQueueData)
+                    .addOnSuccessListener { documentRef ->
+                        val queueId = documentRef.id
+                        showToast("Patient added to queue!")
+
+                        // Save queueId and patientId in SharedPreferences
+                        val sharedPreferences = getSharedPreferences("MediQueuePrefs", MODE_PRIVATE)
+                        with(sharedPreferences.edit()) {
+                            putString("QUEUE_ID", queueId)
+                            putString("PATIENT_ID", patientId)
+                            apply()
+                        }
+
+                        // Navigate to QueueStatusActivity
+                        val intent = Intent(this, QueueStatusActivity::class.java).apply {
+                            putExtra("QUEUE_ID", queueId)
+                            putExtra("PATIENT_ID", patientId)
+                        }
+                        startActivity(intent)
+                        finish() // Close current activity
+                    }
+                    .addOnFailureListener { showToast("Error adding to queue") }
+            }
+            .addOnFailureListener { showToast("Error retrieving queue data") }
     }
 
     private fun generateUniquePatientId(callback: (String) -> Unit) {

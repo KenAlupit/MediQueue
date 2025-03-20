@@ -35,9 +35,50 @@ class QrScanActivity : AppCompatActivity() {
     private lateinit var scanner: BarcodeScanner
     private var isScanning = false
     private val scanDelayHandler = Handler(Looper.getMainLooper())
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Initialize Firestore
+        db = FirebaseFirestore.getInstance()
+
+        // Initialize cameraExecutor
+        cameraExecutor = Executors.newSingleThreadExecutor()
+
+        // Retrieve queue and patient ID from SharedPreferences
+        val sharedPreferences = getSharedPreferences("MediQueuePrefs", MODE_PRIVATE)
+        val queueId = sharedPreferences.getString("QUEUE_ID", null)
+        val patientId = sharedPreferences.getString("PATIENT_ID", null)
+
+        if (queueId != null && patientId != null) {
+            // Check if the patient is still in the queue
+            db.collection("queues").document(queueId).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists() && document.getString("status") == "Pending") {
+                        // Redirect to QueueStatusActivity
+                        val intent = Intent(this, QueueStatusActivity::class.java).apply {
+                            putExtra("QUEUE_ID", queueId)
+                            putExtra("PATIENT_ID", patientId)
+                        }
+                        startActivity(intent)
+                        finish() // Close current activity to prevent going back
+                    } else {
+                        // Queue status is not "Pending", proceed with QR scanning
+                        showQRScanner()
+                    }
+                }
+                .addOnFailureListener {
+                    // Handle Firestore error (e.g., network issues)
+                    showQRScanner()
+                }
+        } else {
+            // No saved queue data, proceed with QR scanning
+            showQRScanner()
+        }
+    }
+
+    private fun showQRScanner() {
         setContentView(R.layout.activity_qr_scan)
 
         val uploadButton: Button = findViewById(R.id.uploadButton)
