@@ -14,16 +14,19 @@ import android.graphics.Canvas
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import com.ciit.mediqueue.MainActivity
 import com.ciit.mediqueue.R
 import com.ciit.mediqueue.patient.QrScanActivity
 import com.google.firebase.firestore.FirebaseFirestore
@@ -73,6 +76,13 @@ class QueueStatusActivity : AppCompatActivity() {
         exportPatientIdImageButton.setOnClickListener {
             exportPatientIdImage()
         }
+
+        onBackPressedDispatcher.addCallback(this) {
+            val intent = Intent(this@QueueStatusActivity, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun getQueuePosition() {
@@ -96,16 +106,35 @@ class QueueStatusActivity : AppCompatActivity() {
     }
 
     private fun checkAndRequestNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE_POST_NOTIFICATIONS)
+        val sharedPreferences = getSharedPreferences("MediQueuePrefs", MODE_PRIVATE)
+
+        val allPrefs = sharedPreferences.all
+        for ((key, value) in allPrefs) {
+            Log.d("QrScanActivity", "SharedPreferences0 - Key: $key, Value: $value")
+        }
+
+        val notificationSent = sharedPreferences.getBoolean("NOTIFICATION_SENT", false)
+
+        if (!notificationSent) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE_POST_NOTIFICATIONS)
+                } else {
+                    // Permission already granted
+                    sendNotification("Queue Update", "You are now being served.")
+                    sharedPreferences.edit().putBoolean("NOTIFICATION_SENT", true).apply()
+                    for ((key, value) in allPrefs) {
+                        Log.d("QrScanActivity", "SharedPreferences1 - Key: $key, Value: $value")
+                    }
+                }
             } else {
-                // Permission already granted
+                // Permission not required for versions below Android 13
                 sendNotification("Queue Update", "You are now being served.")
+                sharedPreferences.edit().putBoolean("NOTIFICATION_SENT", true).apply()
+                for ((key, value) in allPrefs) {
+                    Log.d("QrScanActivity", "SharedPreferences2 - Key: $key, Value: $value")
+                }
             }
-        } else {
-            // Permission not required for versions below Android 13
-            sendNotification("Queue Update", "You are now being served.")
         }
     }
 
@@ -115,6 +144,8 @@ class QueueStatusActivity : AppCompatActivity() {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // Permission granted
                 sendNotification("Queue Update", "You are now being served.")
+                val sharedPreferences = getSharedPreferences("MediQueuePrefs", MODE_PRIVATE)
+                sharedPreferences.edit().putBoolean("NOTIFICATION_SENT", true).apply()
             } else {
                 // Permission denied
                 showToast("Notification permission is not granted.")
@@ -239,7 +270,8 @@ class QueueStatusActivity : AppCompatActivity() {
 
     private fun sendNotification(title: String, message: String) {
         val intent = Intent(this, QueueStatusActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("PATIENT_ID", patientId)
+            putExtra("QUEUE_ID", queueId)
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
