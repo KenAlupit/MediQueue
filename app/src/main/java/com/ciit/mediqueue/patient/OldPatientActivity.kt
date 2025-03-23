@@ -34,11 +34,28 @@ class OldPatientActivity : AppCompatActivity() {
         sendOtpButton.setOnClickListener {
             val patientId = patientIdInput.text.toString().trim()
             if (patientId.isNotEmpty()) {
-                sendOtpToPatient(patientId)
+                checkIfPatientInQueue(patientId)
             } else {
                 showToast("Please enter a Patient ID")
             }
         }
+    }
+
+    private fun checkIfPatientInQueue(patientId: String) {
+        db.collection("queues")
+            .whereEqualTo("patient_id", patientId)
+            .whereIn("status", listOf("Pending", "Serving"))
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    sendOtpToPatient(patientId)
+                } else {
+                    showToast("Patient is already in the queue with status Pending or Serving")
+                }
+            }
+            .addOnFailureListener {
+                showToast("Error checking queue status: ${it.message}")
+            }
     }
 
     private fun sendOtpToPatient(patientId: String) {
