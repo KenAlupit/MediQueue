@@ -6,6 +6,13 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <Button
+        android:id="@+id/showQrButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Show QR Code"
+        android:padding="16dp" />
+
     <TextView
         android:id="@+id/currentlyServingTextView"
         android:layout_width="wrap_content"

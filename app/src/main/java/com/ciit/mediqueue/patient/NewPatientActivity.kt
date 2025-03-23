@@ -305,7 +305,8 @@ class NewPatientActivity : AppCompatActivity() {
             "recent_exposure" to findViewById<CheckBox>(R.id.recentExposure).isChecked,
             "doctor_notes" to "",
             "treatment_plan" to "",
-            "status" to "Pending"
+            "status" to "Pending",
+            "last_updated" to Timestamp.now()
         )
 
         val patientId = intent.getStringExtra("PATIENT_ID")
@@ -360,7 +361,7 @@ class NewPatientActivity : AppCompatActivity() {
                 val newQueueData = hashMapOf(
                     "patient_id" to patientId,
                     "number_in_line" to lastNumber + 1,
-                    "status" to "Pending",
+                    "status" to if (lastNumber == 0L) "Serving" else "Pending",
                     "date_added" to Timestamp.now(),
                     "last_updated" to Timestamp.now()
                 )

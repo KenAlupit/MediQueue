@@ -55,7 +55,7 @@ class QrScanActivity : AppCompatActivity() {
             // Check if the patient is still in the queue
             db.collection("queues").document(queueId).get()
                 .addOnSuccessListener { document ->
-                    if (document.exists() && document.getString("status") == "Pending") {
+                    if (document.exists() && (document.getString("status") == "Pending" || document.getString("status") == "Serving")) {
                         // Redirect to QueueStatusActivity
                         val intent = Intent(this, QueueStatusActivity::class.java).apply {
                             putExtra("QUEUE_ID", queueId)
