@@ -78,6 +78,7 @@ class QrScanActivity : AppCompatActivity() {
         }
     }
 
+
     private fun showQRScanner() {
         setContentView(R.layout.activity_qr_scan)
 

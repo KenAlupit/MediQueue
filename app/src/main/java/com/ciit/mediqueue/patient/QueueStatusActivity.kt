@@ -1,12 +1,17 @@
 package com.ciit.mediqueue.patient
 
 import android.app.AlertDialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.widget.Button
@@ -14,6 +19,9 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.ciit.mediqueue.R
@@ -31,6 +39,12 @@ class QueueStatusActivity : AppCompatActivity() {
     private lateinit var cancelQueueButton: Button
     private lateinit var copyPatientIdButton: Button
     private lateinit var exportPatientIdImageButton: Button
+    private val REQUEST_CODE_POST_NOTIFICATIONS = 1
+
+    companion object {
+        const val CHANNEL_ID = "queue_status_channel"
+        const val NOTIFICATION_ID = 1
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,6 +60,7 @@ class QueueStatusActivity : AppCompatActivity() {
         queueId = intent.getStringExtra("QUEUE_ID") ?: return
 
         getQueuePosition()
+        createNotificationChannel()
 
         cancelQueueButton.setOnClickListener {
             showCancelConfirmationDialog()
@@ -73,7 +88,38 @@ class QueueStatusActivity : AppCompatActivity() {
                 val status = document.getString("status") ?: "Unknown"
 
                 queueStatusTextView.text = "Your position: $numberInLine\nStatus: $status\nPatient ID: $patientId"
+
+                if (status == "Serving") {
+                    checkAndRequestNotificationPermission()
+                }
             }
+    }
+
+    private fun checkAndRequestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE_POST_NOTIFICATIONS)
+            } else {
+                // Permission already granted
+                sendNotification("Queue Update", "You are now being served.")
+            }
+        } else {
+            // Permission not required for versions below Android 13
+            sendNotification("Queue Update", "You are now being served.")
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_CODE_POST_NOTIFICATIONS) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                // Permission granted
+                sendNotification("Queue Update", "You are now being served.")
+            } else {
+                // Permission denied
+                showToast("Notification permission is not granted.")
+            }
+        }
     }
 
     private fun showCancelConfirmationDialog() {
@@ -174,5 +220,44 @@ class QueueStatusActivity : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.channel_name)
+            val descriptionText = getString(R.string.channel_description)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+
+    private fun sendNotification(title: String, message: String) {
+        val intent = Intent(this, QueueStatusActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            with(NotificationManagerCompat.from(this)) {
+                notify(NOTIFICATION_ID, builder.build())
+            }
+        } else {
+            // Handle the case where the permission is not granted
+            showToast("Notification permission is not granted.")
+        }
     }
 }
