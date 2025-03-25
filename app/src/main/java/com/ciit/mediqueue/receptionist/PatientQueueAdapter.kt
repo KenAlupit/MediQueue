@@ -70,28 +70,46 @@ class PatientQueueAdapter(
 
     // Cancel the queue for the given patient ID
     private fun cancelQueue(patientId: String?) {
-        val batch = firestore.batch()
+        val queueRef = firestore.collection(queuesCollection).whereEqualTo("patient_id", patientId).limit(1)
 
-        // Update queue status to "Cancelled"
-        val queueRef = firestore.collection(queuesCollection).document(patientId!!)
-        batch.update(queueRef, "status", "Cancelled")
-
-        // Update medical visit status to "Cancelled"
-        val visitRef = firestore.collection(medicalVisitsCollection).whereEqualTo("patient_id", patientId).limit(1)
-        visitRef.get().addOnSuccessListener { documents ->
+        // Check if the document exists
+        queueRef.get().addOnSuccessListener { documents ->
             if (!documents.isEmpty) {
-                val visitDoc = documents.documents[0].reference
-                batch.update(visitDoc, "status", "Cancelled")
-            }
+                val document = documents.documents[0]
+                val batch = firestore.batch()
 
-            // Commit the batch update
-            batch.commit().addOnSuccessListener {
-                Toast.makeText(context, "Queue cancelled successfully.", Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener {
-                Toast.makeText(context, "Error cancelling queue.", Toast.LENGTH_SHORT).show()
+                // Update queue status to "Cancelled", number_in_line to 0, and last_updated timestamp
+                batch.update(document.reference, mapOf(
+                    "status" to "Cancelled",
+                    "number_in_line" to 0,
+                    "last_updated" to com.google.firebase.Timestamp.now()
+                ))
+
+                // Update medical visit status to "Cancelled" and last_updated timestamp
+                val visitRef = firestore.collection(medicalVisitsCollection).whereEqualTo("patient_id", patientId).limit(1)
+                visitRef.get().addOnSuccessListener { visitDocuments ->
+                    if (!visitDocuments.isEmpty) {
+                        val visitDoc = visitDocuments.documents[0].reference
+                        batch.update(visitDoc, mapOf(
+                            "status" to "Cancelled",
+                            "last_updated" to com.google.firebase.Timestamp.now()
+                        ))
+                    }
+
+                    // Commit the batch update
+                    batch.commit().addOnSuccessListener {
+                        Toast.makeText(context, "Queue cancelled successfully.", Toast.LENGTH_SHORT).show()
+                    }.addOnFailureListener {
+                        Toast.makeText(context, "Error cancelling queue.", Toast.LENGTH_SHORT).show()
+                    }
+                }.addOnFailureListener {
+                    Toast.makeText(context, "Error retrieving medical visit.", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Toast.makeText(context, "Queue document not found.", Toast.LENGTH_SHORT).show()
             }
         }.addOnFailureListener {
-            Toast.makeText(context, "Error retrieving medical visit.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Error checking queue document.", Toast.LENGTH_SHORT).show()
         }
     }
 }

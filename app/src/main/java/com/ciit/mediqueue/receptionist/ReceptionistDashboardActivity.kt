@@ -255,6 +255,8 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
 
                             if (status == "Finished") {
                                 finishedAppointments.add(patientName)
+                            } else if (status == "Cancelled") {
+                                finishedAppointments.add("$patientName (Cancelled)")
                             } else {
                                 patientsInQueue.add(PatientQueueItem(patientId, patientName, patientNumber))
                             }
@@ -364,6 +366,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
                 if (currentNumber > 0) {
                     val newNumber = currentNumber - 1
                     updateBatch.update(doc.reference, "number_in_line", newNumber)
+                    updateBatch.update(doc.reference, "last_updated", Timestamp.now())
 
                     if (newNumber == 1L) {
                         // Mark as "Serving" if number_in_line reaches 1

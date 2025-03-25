@@ -195,16 +195,23 @@ class QueueStatusActivity : AppCompatActivity() {
     private fun cancelQueue() {
         val batch = db.batch()
 
-        // Update queue status to "Cancelled"
+        // Update queue status to "Cancelled" and last_updated timestamp
         val queueRef = db.collection(queuesCollection).document(queueId)
-        batch.update(queueRef, "status", "Cancelled")
+        batch.update(queueRef, mapOf(
+            "status" to "Cancelled",
+            "number_in_line" to 0,
+            "last_updated" to com.google.firebase.Timestamp.now()
+        ))
 
-        // Update medical visit status to "Cancelled"
+        // Update medical visit status to "Cancelled" and last_updated timestamp
         val visitRef = db.collection(medicalVisitsCollection).whereEqualTo("patient_id", patientId).limit(1)
         visitRef.get().addOnSuccessListener { documents ->
             if (!documents.isEmpty) {
                 val visitDoc = documents.documents[0].reference
-                batch.update(visitDoc, "status", "Cancelled")
+                batch.update(visitDoc, mapOf(
+                    "status" to "Cancelled",
+                    "last_updated" to com.google.firebase.Timestamp.now()
+                ))
             }
 
             // Commit the batch update
@@ -343,16 +350,23 @@ class QueueStatusActivity : AppCompatActivity() {
     private fun finishAppointment() {
         val batch = db.batch()
 
-        // Update queue status to "Finished" and number_in_line to 0
+        // Update queue status to "Finished", number_in_line to 0, and last_updated timestamp
         val queueRef = db.collection(queuesCollection).document(queueId)
-        batch.update(queueRef, mapOf("status" to "Finished", "number_in_line" to 0))
+        batch.update(queueRef, mapOf(
+            "status" to "Finished",
+            "number_in_line" to 0,
+            "last_updated" to com.google.firebase.Timestamp.now()
+        ))
 
-        // Update medical visit status to "Finished"
+        // Update medical visit status to "Finished" and last_updated timestamp
         val visitRef = db.collection(medicalVisitsCollection).whereEqualTo("patient_id", patientId).limit(1)
         visitRef.get().addOnSuccessListener { documents ->
             if (!documents.isEmpty) {
                 val visitDoc = documents.documents[0].reference
-                batch.update(visitDoc, "status", "Finished")
+                batch.update(visitDoc, mapOf(
+                    "status" to "Finished",
+                    "last_updated" to com.google.firebase.Timestamp.now()
+                ))
             }
 
             // Commit the batch update
