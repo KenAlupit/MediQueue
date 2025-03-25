@@ -1,7 +1,6 @@
 package com.ciit.mediqueue.patient
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -30,12 +29,27 @@ import java.util.concurrent.Executors
 
 class QrScanActivity : AppCompatActivity() {
 
-    private lateinit var cameraExecutor: ExecutorService
-    private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
-    private lateinit var scanner: BarcodeScanner
-    private var isScanning = false
-    private val scanDelayHandler = Handler(Looper.getMainLooper())
+    // Firebase authentication instance
     private lateinit var db: FirebaseFirestore
+
+    // Executor service for running camera operations in a background thread
+    private lateinit var cameraExecutor: ExecutorService
+
+    // Future to handle the camera provider lifecycle
+    private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
+
+    // Barcode scanner instance for scanning QR codes
+    private lateinit var scanner: BarcodeScanner
+
+    // Flag to prevent multiple scans at the same time
+    private var isScanning = false
+
+    // Handler to add a delay between scans
+    private val scanDelayHandler = Handler(Looper.getMainLooper())
+
+    // Firestore collection names
+    private val qrCodesCollection = "qr_codes"
+    private val queuesCollection = "queues"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +67,7 @@ class QrScanActivity : AppCompatActivity() {
 
         if (queueId != null && patientId != null) {
             // Check if the patient is still in the queue
-            db.collection("queues").document(queueId).get()
+            db.collection(queuesCollection).document(queueId).get()
                 .addOnSuccessListener { document ->
                     if (document.exists() && (document.getString("status") == "Pending" || document.getString("status") == "Serving")) {
                         // Redirect to QueueStatusActivity
@@ -78,19 +92,22 @@ class QrScanActivity : AppCompatActivity() {
         }
     }
 
-
+    // Show the QR scanner UI
     private fun showQRScanner() {
         setContentView(R.layout.activity_qr_scan)
 
+        // Set up upload button for selecting an image from the gallery
         val uploadButton: Button = findViewById(R.id.uploadButton)
         uploadButton.setOnClickListener {
             openFilePicker()
         }
 
+        // Initialize barcode scanner
         scanner = BarcodeScanning.getClient()
         cameraExecutor = Executors.newSingleThreadExecutor()
         cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
+        // Check for camera permissions and start the camera
         if (allPermissionsGranted()) {
             startCamera()
         } else {
@@ -98,6 +115,7 @@ class QrScanActivity : AppCompatActivity() {
         }
     }
 
+    // Start the camera and set up the preview and analysis use cases
     private fun startCamera() {
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
@@ -125,6 +143,7 @@ class QrScanActivity : AppCompatActivity() {
         }, ContextCompat.getMainExecutor(this))
     }
 
+    // Process the image from the camera and scan for QR codes
     @OptIn(ExperimentalGetImage::class)
     private fun processImageProxy(imageProxy: ImageProxy) {
         if (isScanning) {
@@ -154,11 +173,12 @@ class QrScanActivity : AppCompatActivity() {
         }
     }
 
+    // Handle the scanned QR code result
     private fun handleScannedResult(barcode: Barcode) {
         val qrCodeValue = barcode.rawValue
         if (!qrCodeValue.isNullOrEmpty()) {
             val db = FirebaseFirestore.getInstance()
-            db.collection("qr_codes").whereEqualTo("qr_code", qrCodeValue).get()
+            db.collection(qrCodesCollection).whereEqualTo("qr_code", qrCodeValue).get()
                 .addOnSuccessListener { documents ->
                     if (!documents.isEmpty) {
                         // QR code is valid, navigate to another activity
@@ -176,21 +196,24 @@ class QrScanActivity : AppCompatActivity() {
         }
     }
 
+    // Open the file picker to select an image from the gallery
     private fun openFilePicker() {
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "image/*"
         pickImageLauncher.launch(intent)
     }
 
+    // Process the selected image from the gallery
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
+            if (result.resultCode == RESULT_OK) {
                 result.data?.data?.let { uri ->
                     processUploadedImage(uri)
                 }
             }
         }
 
+    // Process the uploaded image and scan for QR codes
     private fun processUploadedImage(uri: Uri) {
         try {
             val image = InputImage.fromFilePath(this, uri)
@@ -212,12 +235,14 @@ class QrScanActivity : AppCompatActivity() {
         }
     }
 
+    // Check if all required permissions are granted
     private fun allPermissionsGranted(): Boolean {
         return REQUIRED_PERMISSIONS.all {
             ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
         }
     }
 
+    // Request camera permissions
     private val requestPermissions =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             if (permissions.all { it.value }) {

@@ -16,31 +16,40 @@ import java.util.*
 
 class NewPatientActivity : AppCompatActivity() {
 
+    // Firebase authentication instance
     private lateinit var db: FirebaseFirestore
+
+    // UI element
     private lateinit var dateOfBirthField: EditText
+
+
     private var selectedDate: Timestamp? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_patient)
 
+        // Initialize Firestore instance
         db = FirebaseFirestore.getInstance()
         dateOfBirthField = findViewById(R.id.dateOfBirth)
 
+        // Set date picker on click
         dateOfBirthField.setOnClickListener {
             showDatePicker()
         }
 
+        // Set submit button click listener
         findViewById<Button>(R.id.submitButton).setOnClickListener {
             savePatientData()
         }
 
+        // Initialize pain level seek bar and label
         val painLevelSeekBar: SeekBar = findViewById(R.id.painLevel)
         val painLevelLabel: TextView = findViewById(R.id.painLevelLabel)
 
         painLevelSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                painLevelLabel.text = "Pain Level: $progress"
+                painLevelLabel.text = getString(R.string.pain_level, progress)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -52,10 +61,15 @@ class NewPatientActivity : AppCompatActivity() {
             }
         })
 
-        val countryCodeSpinner: Spinner = findViewById(R.id.countryCodeSpinner)
-        val phoneNumberField: EditText = findViewById(R.id.phoneNumber)
-        val emergencyCountryCodeSpinner: Spinner = findViewById(R.id.emergencyCountryCodeSpinner)
-        val emergencyPhoneNumberField: EditText = findViewById(R.id.emergencyPhone)
+        // Initialize country code spinners
+        setupCountryCodeSpinners()
+
+        // Prefill patient data if patient ID is provided
+        intent.getStringExtra("PATIENT_ID")?.let { prefillPatientData(it) }
+    }
+
+    // Setup country code spinners
+    private fun setupCountryCodeSpinners() {
         val phoneNumberUtil = PhoneNumberUtil.getInstance()
         val countryCodes = phoneNumberUtil.supportedRegions.map { regionCode ->
             val countryCode = phoneNumberUtil.getCountryCodeForRegion(regionCode)
@@ -64,6 +78,12 @@ class NewPatientActivity : AppCompatActivity() {
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, countryCodes)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        val countryCodeSpinner: Spinner = findViewById(R.id.countryCodeSpinner)
+        val emergencyCountryCodeSpinner: Spinner = findViewById(R.id.emergencyCountryCodeSpinner)
+        val phoneNumberField: EditText = findViewById(R.id.phoneNumber)
+        val emergencyPhoneNumberField: EditText = findViewById(R.id.emergencyPhone)
+
         countryCodeSpinner.adapter = adapter
         countryCodeSpinner.setSelection(countryCodes.indexOf("+63")) // Set default to Philippines
         emergencyCountryCodeSpinner.adapter = adapter
@@ -94,13 +114,9 @@ class NewPatientActivity : AppCompatActivity() {
                 // Do nothing
             }
         }
-
-        val patientId = intent.getStringExtra("PATIENT_ID")
-        if (patientId != null) {
-            prefillPatientData(patientId)
-        }
     }
 
+    // Show date picker dialog
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -112,12 +128,13 @@ class NewPatientActivity : AppCompatActivity() {
             date.set(selectedYear, selectedMonth, selectedDay, 0, 0, 0)
             date.clear(Calendar.MILLISECOND)
             selectedDate = Timestamp(date.time)
-            dateOfBirthField.setText("$selectedYear-${selectedMonth + 1}-$selectedDay")
+            dateOfBirthField.setText(getString(R.string.date_of_birth_format, selectedYear, selectedMonth + 1, selectedDay))
         }, year, month, day)
 
         datePicker.show()
     }
 
+    // Prefill patient data from Firestore
     private fun prefillPatientData(patientId: String) {
         db.collection("patients").document(patientId).get()
             .addOnSuccessListener { document ->
@@ -167,15 +184,16 @@ class NewPatientActivity : AppCompatActivity() {
                         val calendar = Calendar.getInstance()
                         calendar.time = dateOfBirth.toDate()
                         selectedDate = dateOfBirth
-                        dateOfBirthField.setText("${calendar.get(Calendar.YEAR)}-${calendar.get(Calendar.MONTH) + 1}-${calendar.get(Calendar.DAY_OF_MONTH)}")
+                        dateOfBirthField.setText(getString(R.string.date_of_birth_format, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH)))
                     }
                 }
             }
-            .addOnFailureListener {
-                // Handle the error
+            .addOnFailureListener { exception ->
+                showToast("Error fetching patient data: ${exception.message}")
             }
     }
 
+    // Save patient data to Firestore
     private fun savePatientData() {
         val fullName = findViewById<EditText>(R.id.fullName).text.toString()
         val phoneNumber = findViewById<EditText>(R.id.phoneNumber).text.toString()
@@ -191,6 +209,7 @@ class NewPatientActivity : AppCompatActivity() {
         val visitReason = findViewById<EditText>(R.id.visitReason).text.toString()
         val symptoms = findViewById<EditText>(R.id.symptoms).text.toString()
 
+        // Validate required fields
         if (fullName.isEmpty()) {
             showToast("Full Name is required")
             return
@@ -311,6 +330,7 @@ class NewPatientActivity : AppCompatActivity() {
 
         val patientId = intent.getStringExtra("PATIENT_ID")
 
+        // Update existing patient data in Firestore
         if (patientId != null) {
             visitData["patient_id"] = patientId
 
@@ -328,6 +348,7 @@ class NewPatientActivity : AppCompatActivity() {
                 }
                 .addOnFailureListener { showToast("Error updating records") }
         } else {
+            // Save new patient data in Firestore
             generateUniquePatientId { newPatientId ->
                 patientData["patient_id"] = newPatientId
                 visitData["patient_id"] = newPatientId
@@ -349,6 +370,7 @@ class NewPatientActivity : AppCompatActivity() {
         }
     }
 
+    // Add patient to queue in Firestore
     private fun addToQueue(patientId: String) {
         val queueRef = db.collection("queues")
 
@@ -392,6 +414,7 @@ class NewPatientActivity : AppCompatActivity() {
             .addOnFailureListener { showToast("Error retrieving queue data") }
     }
 
+    // Generate a unique patient ID
     private fun generateUniquePatientId(callback: (String) -> Unit) {
         val patientIdPrefix = "PAT-"
         val patientIdLength = 5
@@ -418,10 +441,12 @@ class NewPatientActivity : AppCompatActivity() {
         checkIdExists(generateId())
     }
 
+    // Show a toast message
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
+    // Check if phone number is valid
     private fun isValidPhoneNumber(countryCode: String, phoneNumber: String): Boolean {
         val phoneNumberUtil = PhoneNumberUtil.getInstance()
         return try {
@@ -434,6 +459,7 @@ class NewPatientActivity : AppCompatActivity() {
         }
     }
 
+    // Check if email is valid
     private fun isValidEmail(email: String): Boolean {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     }

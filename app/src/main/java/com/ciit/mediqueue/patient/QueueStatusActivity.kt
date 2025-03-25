@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -25,14 +24,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toBitmap
 import com.ciit.mediqueue.MainActivity
 import com.ciit.mediqueue.R
-import com.ciit.mediqueue.patient.QrScanActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import androidx.core.content.edit
+import androidx.core.graphics.createBitmap
 
 class QueueStatusActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
@@ -42,7 +41,7 @@ class QueueStatusActivity : AppCompatActivity() {
     private lateinit var cancelQueueButton: Button
     private lateinit var copyPatientIdButton: Button
     private lateinit var exportPatientIdImageButton: Button
-    private val REQUEST_CODE_POST_NOTIFICATIONS = 1
+    private val requestCodePostNotifications = 1
 
     companion object {
         const val CHANNEL_ID = "queue_status_channel"
@@ -90,15 +89,14 @@ class QueueStatusActivity : AppCompatActivity() {
             .document(queueId)
             .addSnapshotListener { document, error ->
                 if (error != null || document == null || !document.exists()) {
-                    queueStatusTextView.text = "Error retrieving queue status."
+                    queueStatusTextView.text = getString(R.string.error_retrieving_queue_status)
                     return@addSnapshotListener
                 }
 
                 val numberInLine = document.getLong("number_in_line") ?: 0
                 val status = document.getString("status") ?: "Unknown"
 
-                queueStatusTextView.text = "Your position: $numberInLine\nStatus: $status\nPatient ID: $patientId"
-
+                queueStatusTextView.text = getString(R.string.queue_status, numberInLine, status, patientId)
                 if (status == "Serving") {
                     checkAndRequestNotificationPermission()
                 }
@@ -118,19 +116,19 @@ class QueueStatusActivity : AppCompatActivity() {
         if (!notificationSent) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), REQUEST_CODE_POST_NOTIFICATIONS)
+                    ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), requestCodePostNotifications)
                 } else {
                     // Permission already granted
-                    sendNotification("Queue Update", "You are now being served.")
-                    sharedPreferences.edit().putBoolean("NOTIFICATION_SENT", true).apply()
+                    sendNotification()
+                    sharedPreferences.edit { putBoolean("NOTIFICATION_SENT", true) }
                     for ((key, value) in allPrefs) {
                         Log.d("QrScanActivity", "SharedPreferences1 - Key: $key, Value: $value")
                     }
                 }
             } else {
                 // Permission not required for versions below Android 13
-                sendNotification("Queue Update", "You are now being served.")
-                sharedPreferences.edit().putBoolean("NOTIFICATION_SENT", true).apply()
+                sendNotification()
+                sharedPreferences.edit { putBoolean("NOTIFICATION_SENT", true) }
                 for ((key, value) in allPrefs) {
                     Log.d("QrScanActivity", "SharedPreferences2 - Key: $key, Value: $value")
                 }
@@ -140,12 +138,12 @@ class QueueStatusActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_CODE_POST_NOTIFICATIONS) {
+        if (requestCode == requestCodePostNotifications) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // Permission granted
-                sendNotification("Queue Update", "You are now being served.")
+                sendNotification()
                 val sharedPreferences = getSharedPreferences("MediQueuePrefs", MODE_PRIVATE)
-                sharedPreferences.edit().putBoolean("NOTIFICATION_SENT", true).apply()
+                sharedPreferences.edit { putBoolean("NOTIFICATION_SENT", true) }
             } else {
                 // Permission denied
                 showToast("Notification permission is not granted.")
@@ -207,7 +205,7 @@ class QueueStatusActivity : AppCompatActivity() {
     }
 
     private fun copyPatientIdToClipboard() {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Patient ID", patientId)
         clipboard.setPrimaryClip(clip)
         showToast("Patient ID copied to clipboard.")
@@ -241,7 +239,7 @@ class QueueStatusActivity : AppCompatActivity() {
         val paint = TextView(this).paint
         val width = paint.measureText(combinedText).toInt()
         val height = paint.fontMetricsInt.run { bottom - top } * 2 // Adjust height for two lines of text
-        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(width, height)
         val canvas = Canvas(bitmap)
         canvas.drawColor(android.graphics.Color.WHITE) // Set background color to white
         canvas.drawText(programName, 0f, -paint.fontMetricsInt.top.toFloat(), paint)
@@ -262,13 +260,13 @@ class QueueStatusActivity : AppCompatActivity() {
                 description = descriptionText
             }
             val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
 
 
-    private fun sendNotification(title: String, message: String) {
+    private fun sendNotification() {
         val intent = Intent(this, QueueStatusActivity::class.java).apply {
             putExtra("PATIENT_ID", patientId)
             putExtra("QUEUE_ID", queueId)
@@ -277,8 +275,8 @@ class QueueStatusActivity : AppCompatActivity() {
 
         val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle(title)
-            .setContentText(message)
+            .setContentTitle("Queue Update")
+            .setContentText("You are now being served.")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

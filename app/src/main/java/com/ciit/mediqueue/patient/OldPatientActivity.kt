@@ -16,21 +16,31 @@ import java.util.concurrent.TimeUnit
 
 class OldPatientActivity : AppCompatActivity() {
 
+    // Firebase instances
     private lateinit var db: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
+
+    // Variables for OTP verification
     private lateinit var verificationId: String
     private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
+
+    // Firestore collection names
+    private val queuesCollection = "queues"
+    private val patientsCollection = "patients"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_old_patient)
 
+        // Initialize Firebase instances
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
+        // Initialize UI elements
         val patientIdInput: EditText = findViewById(R.id.patientIdInput)
         val sendOtpButton: Button = findViewById(R.id.sendOtpButton)
 
+        // Set click listener for the send OTP button
         sendOtpButton.setOnClickListener {
             val patientId = patientIdInput.text.toString().trim()
             if (patientId.isNotEmpty()) {
@@ -41,8 +51,9 @@ class OldPatientActivity : AppCompatActivity() {
         }
     }
 
+    // Check if the patient is already in the queue
     private fun checkIfPatientInQueue(patientId: String) {
-        db.collection("queues")
+        db.collection(queuesCollection)
             .whereEqualTo("patient_id", patientId)
             .whereIn("status", listOf("Pending", "Serving"))
             .get()
@@ -58,8 +69,9 @@ class OldPatientActivity : AppCompatActivity() {
             }
     }
 
+    // Send OTP to the patient's phone number
     private fun sendOtpToPatient(patientId: String) {
-        db.collection("patients").document(patientId).get()
+        db.collection(patientsCollection).document(patientId).get()
             .addOnSuccessListener { document ->
                 if (document.exists()) {
                     val phoneNumber = document.getString("phone_number")
@@ -77,6 +89,7 @@ class OldPatientActivity : AppCompatActivity() {
             }
     }
 
+    // Show the OTP dialog for verification
     private fun showOtpDialog(phoneNumber: String) {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_otp_verification, null)
         val otpInput: EditText = dialogView.findViewById(R.id.otpInput)
@@ -88,6 +101,7 @@ class OldPatientActivity : AppCompatActivity() {
             .setCancelable(false)
             .create()
 
+        // Set click listener for the verify OTP button
         verifyOtpButton.setOnClickListener {
             val otpCode = otpInput.text.toString().trim()
             if (otpCode.isNotEmpty()) {
@@ -97,14 +111,17 @@ class OldPatientActivity : AppCompatActivity() {
             }
         }
 
+        // Set click listener for the resend OTP button
         resendOtpButton.setOnClickListener {
             sendOtp(phoneNumber, dialog)
         }
 
+        // Send OTP initially
         sendOtp(phoneNumber, dialog)
         dialog.show()
     }
 
+    // Send OTP to the given phone number
     private fun sendOtp(phoneNumber: String, dialog: AlertDialog) {
         val options = PhoneAuthOptions.newBuilder(auth)
             .setPhoneNumber(phoneNumber)
@@ -131,27 +148,36 @@ class OldPatientActivity : AppCompatActivity() {
         PhoneAuthProvider.verifyPhoneNumber(options)
     }
 
+    // Verify the entered OTP code
     private fun verifyOtp(otpCode: String, dialog: AlertDialog) {
         val credential = PhoneAuthProvider.getCredential(verificationId, otpCode)
         signInWithCredential(credential, dialog)
     }
 
+    // Sign in with the given credential
     private fun signInWithCredential(credential: PhoneAuthCredential, dialog: AlertDialog) {
         auth.signInWithCredential(credential)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     showToast("OTP verified successfully")
                     dialog.dismiss()
-                    val patientId = findViewById<EditText>(R.id.patientIdInput).text.toString().trim()
-                    val intent = Intent(this, NewPatientActivity::class.java)
-                    intent.putExtra("PATIENT_ID", patientId)
-                    startActivity(intent)
+                    navigateToNewPatientActivity()
                 } else {
                     showToast("Incorrect OTP. Please try again.")
                 }
             }
     }
 
+    // Navigate to the NewPatientActivity
+    private fun navigateToNewPatientActivity() {
+        val patientId = findViewById<EditText>(R.id.patientIdInput).text.toString().trim()
+        val intent = Intent(this, NewPatientActivity::class.java).apply {
+            putExtra("PATIENT_ID", patientId)
+        }
+        startActivity(intent)
+    }
+
+    // Show a toast message
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }

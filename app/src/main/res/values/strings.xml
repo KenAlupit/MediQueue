@@ -1,5 +1,28 @@
 <resources>
+    <!-- App Name -->
     <string name="app_name">MediQueue</string>
+
+    <!-- Notification Channel -->
     <string name="channel_name">Queue Status Updates</string>
     <string name="channel_description">Notifications for queue status changes</string>
+
+    <!-- Login Errors -->
+    <string name="login_error_empty_fields">Please enter email and password</string>
+    <string name="login_error_invalid_credentials">Login failed. Please check your credentials.</string>
+
+    <!-- Patient Information -->
+    <string name="patient_info">%1$d: %2$s (ID: %3$s)</string>
+    <string name="currently_serving">Currently Serving: %1$s</string>
+    <string name="previous_patient">Previous Patient: %1$s</string>
+    <string name="next_patient">Next Patient: %1$s</string>
+
+    <!-- Pain Level -->
+    <string name="pain_level">Pain Level: %1$d</string>
+
+    <!-- Date of Birth Format -->
+    <string name="date_of_birth_format">%1$d-%2$d-%3$d</string>
+
+    <!-- Queue Status Messages -->
+    <string name="queue_status">Your position: %1$d\nStatus: %2$s\nPatient ID: %3$s</string>
+    <string name="error_retrieving_queue_status">Error retrieving queue status.</string>
 </resources>

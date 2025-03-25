@@ -2,10 +2,10 @@ package com.ciit.mediqueue.patient
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.ciit.mediqueue.R
+import androidx.core.content.edit
 
 class PatientTypeSelectionActivity : AppCompatActivity() {
 
@@ -13,29 +13,29 @@ class PatientTypeSelectionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_patient_type_selection)
 
+        // Initialize UI elements
         val btnOldPatient: Button = findViewById(R.id.btnOldPatient)
         val btnNewPatient: Button = findViewById(R.id.btnNewPatient)
 
+        // Retrieve shared preferences
         val sharedPreferences = getSharedPreferences("MediQueuePrefs", MODE_PRIVATE)
 
+        // Set click listeners for buttons
         btnOldPatient.setOnClickListener {
-            // Handle old patient button click
-            val intent = Intent(this, OldPatientActivity::class.java)
-            startActivity(intent)
+            navigateToActivity(OldPatientActivity::class.java)
         }
 
         btnNewPatient.setOnClickListener {
-            // Handle new patient button click
-            val intent = Intent(this, NewPatientActivity::class.java)
-            startActivity(intent)
+            navigateToActivity(NewPatientActivity::class.java)
         }
 
-        sharedPreferences.edit().putBoolean("NOTIFICATION_SENT", false).apply()
+        // Reset notification sent flag
+        sharedPreferences.edit { putBoolean("NOTIFICATION_SENT", false) }
+    }
 
-        // Log all shared preferences
-        val allPrefs = sharedPreferences.all
-        for ((key, value) in allPrefs) {
-            Log.d("QrScanActivity", "SharedPreferencesz - Key: $key, Value: $value")
-        }
+    // Function to navigate to a specified activity
+    private fun navigateToActivity(activityClass: Class<*>) {
+        val intent = Intent(this, activityClass)
+        startActivity(intent)
     }
 }

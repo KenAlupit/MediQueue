@@ -25,12 +25,17 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.util.Calendar
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.set
 
 data class PatientQueueItem(val patientId: String, val fullName: String, val numberInLine: Long)
 
 class ReceptionistDashboardActivity : AppCompatActivity() {
 
+    // Firebase authentication instance
     private lateinit var firestore: FirebaseFirestore
+
+    // UI elements
     private lateinit var currentlyServingTextView: TextView
     private lateinit var previousPatientTextView: TextView
     private lateinit var nextPatientTextView: TextView
@@ -38,13 +43,21 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
     private lateinit var finishedAppointmentsListView: ListView
     private lateinit var callNextPatientButton: Button
     private lateinit var showQrButton: Button
+
+    // Firestore collection names
     private val qrCodesCollection = "qr_codes"
+    private val queuesCollection = "queues"
+    private val patientsCollection = "patients"
+    private val medicalVisitsCollection = "medical_visits"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_receptionist_dashboard)
 
+        // Initialize Firestore
         firestore = FirebaseFirestore.getInstance()
+
+        // Initialize UI elements
         currentlyServingTextView = findViewById(R.id.currentlyServingTextView)
         previousPatientTextView = findViewById(R.id.previousPatientTextView)
         nextPatientTextView = findViewById(R.id.nextPatientTextView)
@@ -52,25 +65,21 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
         finishedAppointmentsListView = findViewById(R.id.finishedAppointmentsListView)
         callNextPatientButton = findViewById(R.id.callNextPatientButton)
 
-        callNextPatientButton.setOnClickListener {
-            callNextPatient()
-        }
-
-        fetchQueueData()
-
         showQrButton = findViewById(R.id.showQrButton)
 
-        showQrButton.setOnClickListener {
-            fetchAndShowQRCode()
-        }
+        // Set up button click listeners
+        callNextPatientButton.setOnClickListener { callNextPatient() }
+        showQrButton.setOnClickListener { fetchAndShowQRCode() }
 
+        // Fetch initial queue data and check or generate QR code
+        fetchQueueData()
         checkOrGenerateQRCode()
     }
 
+    // Check if a QR code exists for today, if not, generate a new one
     private fun checkOrGenerateQRCode() {
         val startOfDay = getStartOfDayTimestamp()
 
-        // Query Firestore for QR codes created today
         firestore.collection(qrCodesCollection)
             .whereGreaterThanOrEqualTo("date_created", startOfDay)
             .get()
@@ -84,6 +93,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
             }
     }
 
+    // Generate a unique QR code and store it in Firestore
     private fun generateUniqueQRCode() {
         firestore.collection(qrCodesCollection)
             .get()
@@ -95,9 +105,8 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
                     newCode = (1000..9999).random().toString() // Generate a 4-digit random code
                 } while (existingCodes.contains(newCode)) // Ensure uniqueness
 
-                // Store the new QR Code in Firestore
                 val qrData = hashMapOf(
-                    "date_created" to Timestamp.now(), // Store as Firestore Timestamp
+                    "date_created" to Timestamp.now(),
                     "qr_code" to newCode
                 )
 
@@ -106,6 +115,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
             }
     }
 
+    // Fetch and display the QR code for today
     private fun fetchAndShowQRCode() {
         val startOfDay = getStartOfDayTimestamp()
 
@@ -125,6 +135,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
             }
     }
 
+    // Show a popup with the QR code
     private fun showQRCodePopup(qrCode: String) {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_qr_code, null)
         val qrImageView = dialogView.findViewById<ImageView>(R.id.qrImageView)
@@ -146,16 +157,18 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
         alertDialog.show()
     }
 
+    // Generate a Bitmap for the QR code
     private fun generateQRCodeBitmap(text: String): Bitmap? {
         val qrCodeWriter = QRCodeWriter()
         return try {
             val bitMatrix: BitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 500, 500)
             val width = bitMatrix.width
             val height = bitMatrix.height
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+            val bitmap = createBitmap(width, height, Bitmap.Config.RGB_565)
             for (x in 0 until width) {
                 for (y in 0 until height) {
-                    bitmap.setPixel(x, y, if (bitMatrix[x, y]) android.graphics.Color.BLACK else android.graphics.Color.WHITE)
+                    bitmap[x, y] =
+                        if (bitMatrix[x, y]) android.graphics.Color.BLACK else android.graphics.Color.WHITE
                 }
             }
             bitmap
@@ -165,6 +178,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
         }
     }
 
+    // Save the QR code Bitmap to the gallery
     private fun saveQRCodeToGallery(bitmap: Bitmap?) {
         bitmap?.let {
             val filename = "QR_Code_${System.currentTimeMillis()}.png"
@@ -179,6 +193,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
         }
     }
 
+    // Get the start of the day as a Firestore Timestamp
     private fun getStartOfDayTimestamp(): Timestamp {
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.HOUR_OF_DAY, 0)
@@ -188,8 +203,9 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
         return Timestamp(calendar.time)
     }
 
+    // Fetch queue data and update the UI
     private fun fetchQueueData() {
-        firestore.collection("queues")
+        firestore.collection(queuesCollection)
             .orderBy("number_in_line")
             .addSnapshotListener { queueDocuments, error ->
                 if (error != null) {
@@ -199,9 +215,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
                 }
 
                 if (queueDocuments == null) {
-                    currentlyServingTextView.text = "Currently Serving: None"
-                    previousPatientTextView.text = "Previous Patient: None"
-                    nextPatientTextView.text = "Next Patient: None"
+                    updateQueueUI(null, null, null)
                     return@addSnapshotListener
                 }
 
@@ -214,9 +228,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
                 val queueList = queueDocuments.documents
 
                 if (queueList.isEmpty()) {
-                    currentlyServingTextView.text = "Currently Serving: None"
-                    previousPatientTextView.text = "Previous Patient: None"
-                    nextPatientTextView.text = "Next Patient: None"
+                    updateQueueUI(null, null, null)
                     return@addSnapshotListener
                 }
 
@@ -224,7 +236,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
 
                 // First, fetch all patient names in one batch to avoid multiple Firestore queries
                 val patientIds = queueList.mapNotNull { it.getString("patient_id") }
-                firestore.collection("patients")
+                firestore.collection(patientsCollection)
                     .whereIn(FieldPath.documentId(), patientIds)
                     .get()
                     .addOnSuccessListener { patientsSnapshot ->
@@ -234,7 +246,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
                             patientDataMap[patientId] = patientName
                         }
 
-                        // Now process the queue with the retrieved patient names
+                        // Process the queue with the retrieved patient names
                         for ((index, queueDocument) in queueList.withIndex()) {
                             val patientId = queueDocument.getString("patient_id") ?: continue
                             val patientNumber = queueDocument.getLong("number_in_line") ?: 0
@@ -269,9 +281,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
                         }
 
                         // Update UI
-                        currentlyServingTextView.text = "Currently Serving: ${currentlyServing ?: "None"}"
-                        previousPatientTextView.text = "Previous Patient: ${previousPatient ?: "None"}"
-                        nextPatientTextView.text = "Next Patient: ${nextPatient ?: "None"}"
+                        updateQueueUI(currentlyServing, previousPatient, nextPatient)
 
                         // Populate lists
                         patientsInQueueListView.adapter = PatientQueueAdapter(this, patientsInQueue, firestore)
@@ -284,22 +294,30 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
             }
     }
 
-    private fun callNextPatient() {
-        val queueRef = firestore.collection("queues")
-        val medicalVisitsRef = firestore.collection("medical_visits")
+    // Update the queue status UI
+    private fun updateQueueUI(currentlyServing: String?, previousPatient: String?, nextPatient: String?) {
+        currentlyServingTextView.text = getString(R.string.currently_serving, currentlyServing ?: "None")
+        previousPatientTextView.text = getString(R.string.previous_patient, previousPatient ?: "None")
+        nextPatientTextView.text = getString(R.string.next_patient, nextPatient ?: "None")
+    }
 
-        // 1. Get the currently serving patient
+    // Call the next patient in the queue
+    private fun callNextPatient() {
+        val queueRef = firestore.collection(queuesCollection)
+        val medicalVisitsRef = firestore.collection(medicalVisitsCollection)
+
+        // Get the currently serving patient
         queueRef.whereEqualTo("status", "Serving").get()
             .addOnSuccessListener { servingSnapshot ->
                 if (!servingSnapshot.isEmpty) {
                     val servingDoc = servingSnapshot.documents[0]
                     val servingRef = servingDoc.reference
 
-                    // 2. Mark the currently serving patient as "Finished", set number_in_line to 0, and update the timestamp
+                    // Mark the currently serving patient as "Finished"
                     val updateBatch = firestore.batch()
                     updateBatch.update(servingRef, mapOf("status" to "Finished", "number_in_line" to 0, "last_updated" to Timestamp.now()))
 
-                    // 3. Update the corresponding medical visit to "Finished" and update the timestamp
+                    // Update the corresponding medical visit to "Finished"
                     medicalVisitsRef.whereEqualTo("patient_id", servingDoc.getString("patient_id"))
                         .limit(1)
                         .get()
@@ -311,7 +329,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
 
                             // Commit the update batch
                             updateBatch.commit().addOnSuccessListener {
-                                // 4. Update the number_in_line for remaining patients and set next to serving
+                                // Update the number_in_line for remaining patients and set next to serving
                                 updateAndServeNextPatient()
                             }.addOnFailureListener { e ->
                                 Log.e("Firebase", "Error updating medical visit", e)
@@ -333,8 +351,9 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
             }
     }
 
+    // Update the number_in_line for remaining patients and set the next patient to serving
     private fun updateAndServeNextPatient() {
-        val queueRef = firestore.collection("queues")
+        val queueRef = firestore.collection(queuesCollection)
 
         // Decrement number_in_line for all remaining patients
         queueRef.get().addOnSuccessListener { allQueueSnapshot ->
@@ -363,12 +382,13 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
                             val nextDoc = nextSnapshot.documents[0]
                             val nextPatientName = nextDoc.getString("patient_name") ?: "Unknown"
 
-                            currentlyServingTextView.text = "Currently Serving: $nextPatientName"
+                            currentlyServingTextView.text = getString(R.string.currently_serving, nextPatientName)
+
                             Toast.makeText(this, "Next patient called successfully", Toast.LENGTH_SHORT).show()
                             fetchQueueData() // Refresh UI
                         } else {
                             Toast.makeText(this, "No more patients in queue", Toast.LENGTH_SHORT).show()
-                            currentlyServingTextView.text = "Currently Serving: None"
+                            currentlyServingTextView.text = getString(R.string.currently_serving, "None")
                         }
                     }
                     .addOnFailureListener { e ->

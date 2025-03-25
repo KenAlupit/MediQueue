@@ -9,12 +9,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.ciit.mediqueue.R
-import com.ciit.mediqueue.receptionist.ReceptionistDashboardActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
 
+    // Firebase authentication instance
     private lateinit var auth: FirebaseAuth
+
+    // UI elements
     private lateinit var emailInput: EditText
     private lateinit var passwordInput: EditText
     private lateinit var loginButton: Button
@@ -25,40 +27,50 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
 
+        // Initialize UI elements
         emailInput = findViewById(R.id.editTextEmail)
         passwordInput = findViewById(R.id.editTextPassword)
         loginButton = findViewById(R.id.btnLogin)
         errorText = findViewById(R.id.textError)
         progressBar = findViewById(R.id.progressBar)
 
+        // Set up login button click listener
         loginButton.setOnClickListener {
             loginReceptionist()
         }
     }
 
+    // Function to handle receptionist login
     private fun loginReceptionist() {
         val email = emailInput.text.toString().trim()
         val password = passwordInput.text.toString().trim()
 
+        // Check if email or password is empty
         if (email.isEmpty() || password.isEmpty()) {
-            errorText.text = "Please enter email and password"
+            errorText.text = getString(R.string.login_error_empty_fields)
             errorText.visibility = TextView.VISIBLE
             return
         }
 
+        // Show progress bar
         progressBar.visibility = ProgressBar.VISIBLE
 
+        // Attempt to sign in with email and password
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
+                // Hide progress bar
                 progressBar.visibility = ProgressBar.GONE
                 if (task.isSuccessful) {
+                    // Login successful, start receptionist dashboard activity
                     Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this, ReceptionistDashboardActivity::class.java))
                     finish()
                 } else {
-                    errorText.text = "Login failed. Please check your credentials."
+                    // Login failed
+                    errorText.text = getString(R.string.login_error_invalid_credentials)
                     errorText.visibility = TextView.VISIBLE
                 }
             }
