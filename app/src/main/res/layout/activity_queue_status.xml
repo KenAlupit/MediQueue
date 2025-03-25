@@ -23,6 +23,15 @@
         android:layout_marginTop="16dp"/>
 
     <Button
+        android:id="@+id/finishAppointmentButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Finish Appointment"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
         android:id="@+id/copyPatientIdButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,5 +46,4 @@
         android:text="Export Patient ID Image"
         android:layout_gravity="center"
         android:layout_marginTop="16dp"/>
-
 </LinearLayout>
