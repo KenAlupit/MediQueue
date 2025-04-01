@@ -1,72 +1,177 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fillViewport="true"
+    android:background="@drawable/background_2">
 
-    <Button
-        android:id="@+id/showQrButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Show QR Code"
-        android:padding="16dp" />
-
-    <TextView
-        android:id="@+id/currentlyServingTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Currently Serving:"
-        android:textSize="18sp"
-        android:layout_marginBottom="8dp"/>
-
-    <TextView
-        android:id="@+id/previousPatientTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Previous Patient:"
-        android:layout_marginBottom="8dp"/>
-
-    <TextView
-        android:id="@+id/nextPatientTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Next Patient:"
-        android:layout_marginBottom="16dp"/>
-
-    <Button
-        android:id="@+id/callNextPatientButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Call Next Patient"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"/>
-
-    <TextView
-        android:id="@+id/patientsInQueueTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Patients in Queue:"
-        android:textSize="18sp"
-        android:layout_marginBottom="8dp"/>
-
-    <ListView
-        android:id="@+id/patientsInQueueListView"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"/>
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/finishedAppointmentsTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Finished Appointments:"
-        android:textSize="18sp"
-        android:layout_marginBottom="8dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_border"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:orientation="vertical">
 
-    <ListView
-        android:id="@+id/finishedAppointmentsListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-</LinearLayout>
+            <!-- Currently Serving Section -->
+            <TextView
+                android:id="@+id/currentlyServingTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="Currently Serving"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/currentlyServingPatient"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="John Doe"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/holo_blue_light"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Previous & Next Patient -->
+            <TextView
+                android:id="@+id/previousPatientTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Previous Patient"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/previousPatient"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Jane Doe"
+                android:textSize="20sp"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:id="@+id/nextPatientTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Next Patient"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/nextPatient"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="James Doe"
+                android:textSize="20sp"
+                android:layout_marginBottom="12dp" />
+        </LinearLayout>
+
+        <!-- Patient Queue Section -->
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_border"
+            android:padding="8dp"
+            android:orientation="vertical"
+            android:elevation="2dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/patientsInQueueTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Patient Queue"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#373434"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="8dp"/>
+
+            <ListView
+                android:id="@+id/patientsInQueueListView"
+                android:layout_width="380dp"
+                android:layout_height="200dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="12dp" />
+
+        </LinearLayout>
+
+        <!-- Finished Appointments Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_border"
+            android:padding="8dp"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/finishedAppointmentsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Finished Appointments"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="8dp"/>
+
+            <ListView
+                android:id="@+id/finishedAppointmentsListView"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginBottom="12dp"/>
+        </LinearLayout>
+
+        <!-- Bottom Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/showQrButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Show QR"
+                android:textSize="16dp"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#373434"
+                android:padding="14dp"
+                android:layout_marginRight="8dp"
+                app:cornerRadius="4dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/callNextPatientButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Call Next Patient"
+                android:textSize="16dp"
+                android:textColor="@color/black"
+                android:backgroundTint="@color/white"
+                android:padding="14dp"
+                app:cornerRadius="4dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#373434" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

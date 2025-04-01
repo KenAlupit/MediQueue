@@ -1,6 +1,7 @@
 package com.ciit.mediqueue.receptionist
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -53,7 +54,8 @@ class PatientQueueAdapter(
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_cancel_queue, null)
         val patientIdInput = dialogView.findViewById<EditText>(R.id.patientIdInput)
 
-        AlertDialog.Builder(context)
+        // Create the AlertDialog
+        val alertDialog = AlertDialog.Builder(context)
             .setTitle("Cancel Queue")
             .setView(dialogView)
             .setPositiveButton("Confirm") { _, _ ->
@@ -65,8 +67,27 @@ class PatientQueueAdapter(
                 }
             }
             .setNegativeButton("Cancel", null)
-            .show()
+            .create()
+
+        // Set OnShowListener to modify the button styles after the dialog is shown
+        alertDialog.setOnShowListener {
+            // Positive button customization (Confirm)
+            val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            positiveButton.setTextColor(Color.WHITE)
+            positiveButton.setBackgroundColor(Color.DKGRAY)
+            positiveButton.setPadding(20, 10, 20, 10)
+
+            // Negative button customization (Cancel)
+            val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            negativeButton.setTextColor(Color.DKGRAY)
+            negativeButton.setBackgroundColor(Color.WHITE)
+            negativeButton.setPadding(20, 10, 20, 10)
+        }
+
+        // Show the dialog
+        alertDialog.show()
     }
+
 
     // Cancel the queue for the given patient ID
     private fun cancelQueue(patientId: String?) {

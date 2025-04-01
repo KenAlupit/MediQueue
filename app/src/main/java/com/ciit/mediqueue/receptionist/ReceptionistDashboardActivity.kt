@@ -1,6 +1,7 @@
 package com.ciit.mediqueue.receptionist
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -37,8 +38,11 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
 
     // UI elements
     private lateinit var currentlyServingTextView: TextView
+    private lateinit var currentlyServingActive: TextView
     private lateinit var previousPatientTextView: TextView
+    private lateinit var previousPatientActive: TextView
     private lateinit var nextPatientTextView: TextView
+    private lateinit var nextPatientActive: TextView
     private lateinit var patientsInQueueListView: ListView
     private lateinit var finishedAppointmentsListView: ListView
     private lateinit var callNextPatientButton: Button
@@ -59,8 +63,11 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
 
         // Initialize UI elements
         currentlyServingTextView = findViewById(R.id.currentlyServingTextView)
+        currentlyServingActive = findViewById(R.id.currentlyServingPatient)
         previousPatientTextView = findViewById(R.id.previousPatientTextView)
+        previousPatientActive = findViewById(R.id.previousPatient)
         nextPatientTextView = findViewById(R.id.nextPatientTextView)
+        nextPatientActive = findViewById(R.id.nextPatient)
         patientsInQueueListView = findViewById(R.id.patientsInQueueListView)
         finishedAppointmentsListView = findViewById(R.id.finishedAppointmentsListView)
         callNextPatientButton = findViewById(R.id.callNextPatientButton)
@@ -144,18 +151,30 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
         val qrBitmap = generateQRCodeBitmap(qrCode)
         qrImageView.setImageBitmap(qrBitmap)
 
+        // Create the AlertDialog first
         val alertDialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setPositiveButton("Close", null)
             .create()
+
+        // Set OnShowListener to modify the positive button after the dialog is shown
+        alertDialog.setOnShowListener {
+            // Now that the dialog is shown, modify the positive button
+            val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            positiveButton.setTextColor(Color.DKGRAY)
+            positiveButton.setBackgroundColor(Color.WHITE)
+            positiveButton.setPadding(20, 10, 20, 10)
+        }
 
         downloadButton.setOnClickListener {
             saveQRCodeToGallery(qrBitmap)
             Toast.makeText(this, "QR Code saved to gallery!", Toast.LENGTH_SHORT).show()
         }
 
+        // Finally, show the dialog
         alertDialog.show()
     }
+
 
     // Generate a Bitmap for the QR code
     private fun generateQRCodeBitmap(text: String): Bitmap? {
@@ -297,10 +316,11 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
     }
 
     // Update the queue status UI
-    private fun updateQueueUI(currentlyServing: String?, previousPatient: String?, nextPatient: String?) {
-        currentlyServingTextView.text = getString(R.string.currently_serving, currentlyServing ?: "None")
-        previousPatientTextView.text = getString(R.string.previous_patient, previousPatient ?: "None")
-        nextPatientTextView.text = getString(R.string.next_patient, nextPatient ?: "None")
+    private fun updateQueueUI(currentlyServing: String?,  previousPatient: String?,  nextPatient: String?) {
+        currentlyServingActive.text = currentlyServing ?: "None"
+        previousPatientActive.text = previousPatient ?: "None"
+        nextPatientActive.text = nextPatient ?: "None"
+
     }
 
     // Call the next patient in the queue
@@ -385,13 +405,13 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
                             val nextDoc = nextSnapshot.documents[0]
                             val nextPatientName = nextDoc.getString("patient_name") ?: "Unknown"
 
-                            currentlyServingTextView.text = getString(R.string.currently_serving, nextPatientName)
+                            currentlyServingActive.text = nextPatientName
 
                             Toast.makeText(this, "Next patient called successfully", Toast.LENGTH_SHORT).show()
                             fetchQueueData() // Refresh UI
                         } else {
                             Toast.makeText(this, "No more patients in queue", Toast.LENGTH_SHORT).show()
-                            currentlyServingTextView.text = getString(R.string.currently_serving, "None")
+                            currentlyServingActive.text = "None"
                         }
                     }
                     .addOnFailureListener { e ->

@@ -1,21 +1,74 @@
-<!-- res/layout/activity_patient_type_selection.xml -->
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:gravity="center">
+    android:background="@drawable/menu_background"
+    android:padding="16dp">
 
-    <Button
+    <!-- Content container to push elements to the top -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- Placeholder Image -->
+        <ImageView
+            android:id="@+id/appLogo"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/logo_dark"
+            android:contentDescription="App Logo" />
+
+        <!-- App Name -->
+        <ImageView
+            android:id="@+id/appTitle"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/welcome_text"
+            android:contentDescription="App Logo"
+            android:layout_marginTop="24dp" />
+    </LinearLayout>
+
+    <!-- Spacer to push buttons down -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5" />
+
+    <!-- Buttons at the bottom -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnOldPatient"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Old Patient" />
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="@color/white"
+        android:padding="14dp"
+        android:text="Old Patient"
+        android:textAllCaps="false"
+        android:textColor="#373434"
+        android:textSize="16sp"
+        app:cornerRadius="4dp"
+        app:strokeWidth="1dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnNewPatient"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:cornerRadius="4dp"
+        android:elevation="2dp"
         android:text="New Patient"
-        android:layout_marginTop="16dp" />
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:backgroundTint="#373434"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="150dp"
+        android:padding="14dp" />
+
 </LinearLayout>

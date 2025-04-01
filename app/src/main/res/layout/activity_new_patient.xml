@@ -1,286 +1,605 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#F2F2F2"
         android:orientation="vertical"
         android:padding="20dp">
 
+        <!-- Full Name -->
         <TextView
+            android:id="@+id/fullNameLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Full Name" />
-        <EditText
-            android:id="@+id/fullName"
+            android:layout_marginBottom="4dp"
+            android:text="Full Name"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Full Name" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Date of Birth (YYYY-MM-DD)" />
-        <EditText
-            android:id="@+id/dateOfBirth"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Date of Birth (YYYY-MM-DD)"
-            android:focusable="false" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sex" />
-        <RadioGroup
-            android:id="@+id/sexGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <RadioButton
-                android:id="@+id/sexMale"
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/fullName"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Male" />
-            <RadioButton
-                android:id="@+id/sexFemale"
-                android:layout_width="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Full Name"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Date of Birth -->
+        <TextView
+            android:id="@+id/birthLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:text="Date of Birth"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
+
+            <EditText
+                android:id="@+id/dateOfBirth"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Female" />
-        </RadioGroup>
+                android:backgroundTint="@color/white"
+                android:focusable="false"
+                android:hint="Date of Birth (YYYY-MM-DD)"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
 
+        <!-- Sex -->
         <TextView
+            android:id="@+id/sexLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Phone Number" />
+            android:layout_marginBottom="4dp"
+            android:text="Sex"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
+
+            <RadioGroup
+                android:id="@+id/sexGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp">
+
+                <RadioButton
+                    android:id="@+id/sexMale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:buttonTint="#373434"
+                    android:text="Male" />
+
+                <RadioButton
+                    android:id="@+id/sexFemale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:buttonTint="#373434"
+                    android:text="Female" />
+            </RadioGroup>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Phone Number -->
         <TextView
+            android:id="@+id/phoneLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Country Code" />
-
-        <Spinner
-            android:id="@+id/countryCodeSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:id="@+id/phoneNumber"
+            android:layout_marginBottom="4dp"
+            android:text="Phone Number"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Phone Number"
-            android:inputType="phone" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <Spinner
+                    android:id="@+id/countryCodeSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp" />
+
+                <EditText
+                    android:id="@+id/phoneNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="09XX XXX XXXX"
+                    android:inputType="phone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Email -->
         <TextView
+            android:id="@+id/emailLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Email (Optional)" />
-        <EditText
-            android:id="@+id/email"
+            android:layout_marginBottom="4dp"
+            android:text="Email Address (Optional)"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email (Optional)"
-            android:inputType="textEmailAddress" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
+            <EditText
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Email"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Address -->
         <TextView
+            android:id="@+id/addressLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Address" />
-        <EditText
-            android:id="@+id/address"
+            android:layout_marginBottom="4dp"
+            android:text="Address"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Address" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
+            <EditText
+                android:id="@+id/address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Address"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Emergency Contact -->
         <TextView
+            android:id="@+id/emergencyLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Emergency Contact Name" />
-        <EditText
-            android:id="@+id/emergencyName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Emergency Contact Name" />
+            android:layout_marginBottom="4dp"
+            android:text="Emergency Contact"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
+
+            <EditText
+                android:id="@+id/emergencyName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Emergency Contact Name"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
+
+            <EditText
+                android:id="@+id/emergencyRelationship"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Emergency Contact Relationship"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:orientation="horizontal"
+                android:padding="12dp">
+
+                <Spinner
+                    android:id="@+id/emergencyCountryCodeSpinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp" />
+
+                <EditText
+                    android:id="@+id/emergencyPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="09XX XXX XXXX"
+                    android:inputType="phone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Medical History -->
         <TextView
+            android:id="@+id/medicationsLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Emergency Contact Relationship" />
-        <EditText
-            android:id="@+id/emergencyRelationship"
+            android:layout_marginBottom="4dp"
+            android:text="Medical History"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Emergency Contact Relationship" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Emergency Contact Phone" />
+            <EditText
+                android:id="@+id/medications"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Medications (comma-separated)"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Country Code" />
-        <Spinner
-            android:id="@+id/emergencyCountryCodeSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-        <EditText
-            android:id="@+id/emergencyPhone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Emergency Contact Phone"
-            android:inputType="phone" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Medications (comma-separated)" />
-        <EditText
-            android:id="@+id/medications"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Medications (comma-separated)" />
+            <EditText
+                android:id="@+id/allergies"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Allergies (comma-separated)"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Allergies (comma-separated)" />
-        <EditText
-            android:id="@+id/allergies"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Allergies (comma-separated)" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Conditions (comma-separated)" />
-        <EditText
-            android:id="@+id/conditions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Conditions (comma-separated)" />
+            <EditText
+                android:id="@+id/conditions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Conditions (comma-separated)"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Past Surgeries (comma-separated)" />
-        <EditText
-            android:id="@+id/surgeries"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Past Surgeries (comma-separated)" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Reason for Visit" />
-        <EditText
-            android:id="@+id/visitReason"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Reason for Visit" />
+            <EditText
+                android:id="@+id/surgeries"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Past Surgeries"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Symptoms" />
-        <EditText
-            android:id="@+id/symptoms"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Symptoms" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
-        <TextView
-            android:id="@+id/painLevelLabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Pain Level: 0" />
+            <EditText
+                android:id="@+id/visitReason"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Reason for Visit"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <SeekBar
-            android:id="@+id/painLevel"
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:max="10" />
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
-        <CheckBox
-            android:id="@+id/recentTravel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Recent Travel History" />
+            <EditText
+                android:id="@+id/symptoms"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Symptoms"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <CheckBox
-            android:id="@+id/recentExposure"
-            android:layout_width="wrap_content"
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Recent Exposure to Illness" />
+            android:layout_marginBottom="12dp"
+            android:padding="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Smoking Frequency (e.g., None, Occasionally, Daily)" />
-        <EditText
-            android:id="@+id/smoking"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Smoking Frequency (e.g., None, Occasionally, Daily)" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Alcohol Use (e.g., None, Occasionally, Daily)" />
-        <EditText
-            android:id="@+id/alcohol"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Alcohol Use (e.g., None, Occasionally, Daily)" />
+                <TextView
+                    android:id="@+id/painLevelLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="Pain Level: 0" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Exercise Frequency (e.g., None, Weekly, Daily)" />
-        <EditText
-            android:id="@+id/exercise"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Exercise Frequency (e.g., None, Weekly, Daily)" />
+                <SeekBar
+                    android:id="@+id/painLevel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progressTint="#373434"
+                    android:thumbTint="#5ce1e6"
+                    android:max="10"
+                    android:paddingBottom="8dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Dietary Restrictions" />
-        <EditText
-            android:id="@+id/diet"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Dietary Restrictions" />
+            android:layout_marginBottom="12dp"
+            android:padding="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Insurance Provider" />
-        <EditText
-            android:id="@+id/insuranceProvider"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Insurance Provider" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Policy Number" />
-        <EditText
-            android:id="@+id/policyNumber"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Policy Number" />
+                <CheckBox
+                    android:id="@+id/recentTravel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="#373434"
+                    android:text="Recent Travel History" />
 
-        <Button
+                <CheckBox
+                    android:id="@+id/recentExposure"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="#373434"
+                    android:text="Recent Exposure to Illness" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
+
+            <EditText
+                android:id="@+id/smoking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Smoking Frequency (e.g., None, Occasionally, Daily)"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
+
+            <EditText
+                android:id="@+id/alcohol"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Alcohol Use (e.g., None, Occasionally, Daily)"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
+
+            <EditText
+                android:id="@+id/exercise"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Exercise Frequency (e.g., None, Weekly, Daily)"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
+
+            <EditText
+                android:id="@+id/diet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Dietary Restrictions"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
+
+            <EditText
+                android:id="@+id/insuranceProvider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Insurance Provider"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="4dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="#5ce1e6"
+            app:strokeWidth="2dp">
+
+            <EditText
+                android:id="@+id/policyNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/white"
+                android:hint="Policy Number"
+                android:padding="12dp" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Submit  -->
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/submitButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Submit" />
-
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#373434"
+            android:padding="14dp"
+            android:text="Submit"
+            android:textSize="16dp"
+            app:cornerRadius="4dp" />
     </LinearLayout>
 </ScrollView>

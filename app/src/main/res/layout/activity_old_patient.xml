@@ -2,30 +2,58 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:background="#F2F2F2"
     android:padding="20dp"
     android:gravity="center">
 
     <!-- Patient ID Input -->
-    <EditText
-        android:id="@+id/patientIdInput"
+
+    <TextView
+        android:id="@+id/patientIDLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Patient ID"
-        android:inputType="text"
-        android:padding="10dp"
-        android:textSize="16sp" />
+        android:layout_marginBottom="4dp"
+        android:text="Patient ID"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        android:backgroundTint="@color/white"
+        app:strokeColor="#5ce1e6"
+        app:strokeWidth="2dp">
+
+        <EditText
+            android:id="@+id/patientIdInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:hint="Enter Patient ID"
+            android:inputType="text"
+            android:padding="18dp"
+            android:textSize="16sp" />
+    </com.google.android.material.card.MaterialCardView>
+
+
 
     <!-- Send OTP Button -->
-    <Button
+
+    <!-- OTP Input Field -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/sendOtpButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Send OTP"
         android:layout_marginTop="15dp"
-        android:textSize="16sp" />
+        android:padding="14dp"
+        android:backgroundTint="#373434"
+        android:text="Send OTP"
+        android:textSize="16sp"
+        app:cornerRadius="4dp"/>
 
-    <!-- OTP Input Field -->
     <EditText
         android:id="@+id/otpInput"
         android:layout_width="match_parent"

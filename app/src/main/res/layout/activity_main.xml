@@ -3,42 +3,87 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="20dp"
+    android:background="@drawable/menu_background"
+    android:padding="16dp"
     tools:context=".MainActivity">
 
-    <!-- Title -->
+    <!-- Disclaimer -->
     <TextView
-        android:id="@+id/titleText"
-        android:layout_width="wrap_content"
+        android:id="@+id/disclaimerText"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="MediQueue"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black"
-        android:gravity="center"
-        android:paddingBottom="30dp"/>
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="18dp"
+        android:text="Disclaimer: This screen is for testing purposes only and will not be included in the final version of the application."
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="12sp" />
 
-    <!-- Patient Check-In Button -->
-    <Button
+    <!-- Content container to push elements to the top -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <!-- Placeholder Image -->
+        <ImageView
+            android:id="@+id/appLogo"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/logo_dark"
+            android:contentDescription="App Logo"
+            android:layout_marginBottom="0dp" />
+
+        <!-- App Name -->
+        <ImageView
+            android:id="@+id/appTitle"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/mediqueue_text_dark"
+            android:contentDescription="App Logo"
+            android:layout_marginBottom="16dp" />
+    </LinearLayout>
+
+    <!-- Spacer to push buttons down -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5" />
+
+    <!-- Buttons at the bottom -->
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnPatientCheckIn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="@color/white"
+        android:elevation="2dp"
+        android:padding="14dp"
         android:text="Patient Check-In"
-        android:textSize="18sp"
-        android:padding="10dp"
-        android:textColor="@android:color/white"
-        android:layout_marginBottom="20dp"/>
+        android:textAllCaps="false"
+        android:textColor="#373434"
+        android:textSize="16sp"
+        app:cornerRadius="4dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#373434"/>
 
-    <!-- Receptionist Login Button -->
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnReceptionistLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Receptionist Login"
-        android:textSize="18sp"
-        android:padding="10dp"
-        android:textColor="@android:color/white"/>
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:backgroundTint="#373434"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="150dp"
+        android:padding="14dp"
+        app:cornerRadius="4dp"/>
 
 </LinearLayout>

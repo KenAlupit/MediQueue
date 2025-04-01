@@ -16,10 +16,6 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        // Set title text
-        val titleText: TextView = findViewById(R.id.titleText)
-        titleText.text = getString(R.string.app_name)
-
         // Set up Patient Check-In button
         val patientButton: Button = findViewById(R.id.btnPatientCheckIn)
         patientButton.setOnClickListener {

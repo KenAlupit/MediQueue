@@ -2,24 +2,60 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:background="#F2F2F2"
     android:padding="16dp">
 
-    <EditText
-        android:id="@+id/otpInput"
+    <TextView
+        android:id="@+id/patientIDLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter OTP" />
+        android:layout_marginBottom="4dp"
+        android:text="OTP Code"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        android:backgroundTint="@color/white"
+        app:strokeColor="#5ce1e6"
+        app:strokeWidth="2dp">
 
-    <Button
+        <EditText
+            android:id="@+id/otpInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/white"
+            android:hint="Enter OTP"
+            android:inputType="text"
+            android:padding="18dp"
+            android:textSize="16sp" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/verifyOtpButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Verify OTP" />
+        android:padding="13dp"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/black"
+        android:text="Verify OTP"
+        android:textSize="16dp"
+        app:strokeWidth="1dp"
+        app:cornerRadius="4dp"
+        app:strokeColor="#373434" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/resendOtpButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Resend OTP" />
+        android:padding="13dp"
+        android:backgroundTint="#373434"
+        app:cornerRadius="4dp"
+        android:text="Resend OTP"
+        android:textSize="16dp"/>
 </LinearLayout>

@@ -1,49 +1,167 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background"
     android:orientation="vertical"
-    android:gravity="center"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/queueStatusTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Loading queue status..."
-        android:textSize="20sp"
-        android:textStyle="bold" />
+    <!-- Spacer to push content to center -->
+    <ImageView
+        android:id="@+id/appLogo"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/logo_dark"
+        android:contentDescription="App Logo"
+        android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/cancelQueueButton"
-        android:layout_width="wrap_content"
+    <!-- Patient ID Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cancel Queue"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="24dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#373434">
 
-    <Button
-        android:id="@+id/finishAppointmentButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Finish Appointment"
-        android:visibility="gone"
-        android:layout_gravity="center"
-        android:layout_marginBottom="16dp"/>
+        <TextView
+            android:id="@+id/patientIdTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_gradient"
+            android:gravity="center"
+            android:padding="16dp"
+            android:text="Patient ID: XYZ-12345"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </com.google.android.material.card.MaterialCardView>
 
-    <Button
-        android:id="@+id/copyPatientIdButton"
-        android:layout_width="wrap_content"
+    <!-- Status and Position Card -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Copy Patient ID"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"/>
+        android:padding="16dp"
+        app:cardCornerRadius="24dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#373434">
 
-    <Button
-        android:id="@+id/exportPatientIdImageButton"
-        android:layout_width="wrap_content"
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_gradient"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <!-- Status -->
+            <TextView
+                android:id="@+id/statusTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/button_gradient"
+                android:gravity="center"
+                android:text="Status: Serving"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/lineTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:background="@drawable/button_gradient"
+                android:gravity="center"
+                android:text="69"
+                android:textColor="@color/white"
+                android:textSize="128sp"
+                android:textStyle="bold" />
+
+            <!-- Position -->
+            <TextView
+                android:id="@+id/positionTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_gradient"
+                android:gravity="center"
+                android:paddingBottom="80dp"
+                android:text="Position in queue"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Spacer to push content to center -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Buttons Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Export Patient ID Image"
-        android:layout_gravity="center"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginBottom="120dp"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/cancelQueueButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:padding="14dp"
+            android:text="Cancel Queue"
+            android:textColor="@android:color/black"
+            android:textSize="16dp"
+            app:backgroundTint="@color/white"
+            app:cornerRadius="4dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#373434" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/finishAppointmentButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:padding="14dp"
+            android:text="Finish Appointment"
+            android:textColor="@android:color/black"
+            android:textSize="16dp"
+            android:backgroundTint="@color/white"
+            android:visibility="gone"
+            app:cornerRadius="4dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#373434" />
+
+        <Button
+            android:id="@+id/copyPatientIdButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:padding="14dp"
+            android:text="Copy Patient ID"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            app:backgroundTint="#373434"
+            app:cornerRadius="4dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/exportPatientIdImageButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="14dp"
+            android:text="Download Patient ID"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            app:backgroundTint="#373434"
+            app:cornerRadius="4dp"
+            app:elevation="8dp" />
+    </LinearLayout>
+
 </LinearLayout>

@@ -10,6 +10,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -40,7 +41,10 @@ class QueueStatusActivity : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
 
     // UI elements
-    private lateinit var queueStatusTextView: TextView
+    private lateinit var patientIdTextView: TextView
+    private lateinit var statusTextView: TextView
+    private lateinit var positionTextView: TextView
+    private lateinit var lineTextView: TextView
     private lateinit var patientId: String
     private lateinit var queueId: String
     private lateinit var cancelQueueButton: Button
@@ -67,7 +71,10 @@ class QueueStatusActivity : AppCompatActivity() {
         db = FirebaseFirestore.getInstance()
 
         // Initialize UI elements
-        queueStatusTextView = findViewById(R.id.queueStatusTextView)
+        patientIdTextView = findViewById(R.id.patientIdTextView)
+        statusTextView = findViewById(R.id.statusTextView)
+        positionTextView = findViewById(R.id.positionTextView)
+        lineTextView = findViewById(R.id.lineTextView)
         cancelQueueButton = findViewById(R.id.cancelQueueButton)
         finishAppointmentButton = findViewById(R.id.finishAppointmentButton)
         copyPatientIdButton = findViewById(R.id.copyPatientIdButton)
@@ -102,14 +109,19 @@ class QueueStatusActivity : AppCompatActivity() {
             .document(queueId)
             .addSnapshotListener { document, error ->
                 if (error != null || document == null || !document.exists()) {
-                    queueStatusTextView.text = getString(R.string.error_retrieving_queue_status)
+                    statusTextView.text = getString(R.string.error_retrieving_queue_status)
                     return@addSnapshotListener
                 }
 
                 val numberInLine = document.getLong("number_in_line") ?: 0
                 val status = document.getString("status") ?: "Unknown"
 
-                queueStatusTextView.text = getString(R.string.queue_status, numberInLine, status, patientId)
+                // Update each TextView separately
+                patientIdTextView.text = "Patient ID: $patientId"
+                positionTextView.text = "Position in Queue"
+                lineTextView.text = "$numberInLine"
+                statusTextView.text = "Status: $status"
+
                 if (status == "Serving") {
                     cancelQueueButton.visibility = View.GONE
                     finishAppointmentButton.visibility = View.VISIBLE
@@ -176,7 +188,7 @@ class QueueStatusActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_cancel_queue, null)
         val patientIdInput = dialogView.findViewById<EditText>(R.id.patientIdInput)
 
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle("Cancel Queue")
             .setView(dialogView)
             .setPositiveButton("Confirm") { _, _ ->
@@ -188,8 +200,26 @@ class QueueStatusActivity : AppCompatActivity() {
                 }
             }
             .setNegativeButton("Cancel", null)
-            .show()
+            .create() // Create the dialog but don't show it yet
+
+        dialog.setOnShowListener {
+            // Get buttons and customize them
+            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+            // Apply custom styles
+            positiveButton.setTextColor(Color.WHITE)
+            positiveButton.setBackgroundColor(Color.DKGRAY)
+            positiveButton.setPadding(20, 10, 20, 10)
+
+            negativeButton.setTextColor(Color.DKGRAY)
+            negativeButton.setBackgroundColor(Color.WHITE)
+            negativeButton.setPadding(20, 10, 20, 10)
+        }
+
+        dialog.show() // Show the styled dialog
     }
+
 
     // Cancels the queue and updates the Firestore database.
     private fun cancelQueue() {
@@ -331,7 +361,7 @@ class QueueStatusActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_finish_appointment, null)
         val patientIdInput = dialogView.findViewById<EditText>(R.id.patientIdInput)
 
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle("Finish Appointment")
             .setView(dialogView)
             .setPositiveButton("Confirm") { _, _ ->
@@ -343,8 +373,26 @@ class QueueStatusActivity : AppCompatActivity() {
                 }
             }
             .setNegativeButton("Cancel", null)
-            .show()
+            .create() // Create the dialog but don't show it yet
+
+        dialog.setOnShowListener {
+            // Get buttons and customize them
+            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+            // Apply custom styles
+            positiveButton.setTextColor(Color.WHITE)
+            positiveButton.setBackgroundColor(Color.DKGRAY)
+            positiveButton.setPadding(20, 10, 20, 10)
+
+            negativeButton.setTextColor(Color.DKGRAY)
+            negativeButton.setBackgroundColor(Color.WHITE)
+            negativeButton.setPadding(20, 10, 20, 10)
+        }
+
+        dialog.show() // Show the styled dialog
     }
+
 
     // Finishes the appointment and updates the Firestore database.
     private fun finishAppointment() {
