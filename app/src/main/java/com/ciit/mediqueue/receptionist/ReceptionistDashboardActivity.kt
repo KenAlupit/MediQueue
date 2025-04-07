@@ -301,6 +301,39 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
                             }
                         }
 
+                        // Find the most recent finished patient
+                        firestore.collection(queuesCollection)
+                            .whereEqualTo("status", "Finished")
+                            .orderBy("last_updated", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                            .limit(1)
+                            .get()
+                            .addOnSuccessListener { finishedSnapshot ->
+                                if (!finishedSnapshot.isEmpty) {
+                                    val finishedDoc = finishedSnapshot.documents[0]
+                                    val patientId = finishedDoc.getString("patient_id") ?: "Unknown"
+                                    firestore.collection(patientsCollection).document(patientId).get()
+                                        .addOnSuccessListener { patientDoc ->
+                                            previousPatient = patientDoc.getString("full_name") ?: "Unknown"
+                                            Log.d("Firebase", "Most recent finished patient: $previousPatient")
+
+                                            // Update UI
+                                            previousPatientActive.text = previousPatient ?: "None"
+                                        }
+                                        .addOnFailureListener { e ->
+                                            previousPatient = "Unknown"
+                                            Log.d("Firebase", "Error fetching patient name", e)
+                                        }
+                                } else {
+                                    previousPatient = "None"
+
+                                    Log.d("Firebase", "No finished patients found")
+                                }
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("Firebase", "Error fetching finished patient", e)
+                                Toast.makeText(this, "Error fetching finished patient", Toast.LENGTH_SHORT).show()
+                            }
+
                         // Update UI
                         updateQueueUI(currentlyServing, previousPatient, nextPatient)
 
@@ -338,6 +371,7 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
                     // Mark the currently serving patient as "Finished"
                     val updateBatch = firestore.batch()
                     updateBatch.update(servingRef, mapOf("status" to "Finished", "number_in_line" to 0, "last_updated" to Timestamp.now()))
+
 
                     // Update the corresponding medical visit to "Finished"
                     medicalVisitsRef.whereEqualTo("patient_id", servingDoc.getString("patient_id"))
@@ -407,8 +441,37 @@ class ReceptionistDashboardActivity : AppCompatActivity() {
 
                             currentlyServingActive.text = nextPatientName
 
-                            Toast.makeText(this, "Next patient called successfully", Toast.LENGTH_SHORT).show()
-                            fetchQueueData() // Refresh UI
+                            // Find the most recent finished patient
+                            firestore.collection(queuesCollection)
+                                .whereEqualTo("status", "Finished")
+                                .orderBy("last_updated", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                                .limit(1)
+                                .get()
+                                .addOnSuccessListener { finishedSnapshot ->
+                                    if (!finishedSnapshot.isEmpty) {
+                                        val finishedDoc = finishedSnapshot.documents[0]
+                                        val patientId = finishedDoc.getString("patient_id") ?: "Unknown"
+                                        firestore.collection(patientsCollection).document(patientId).get()
+                                            .addOnSuccessListener { patientDoc ->
+                                                previousPatientActive.text = patientDoc.getString("full_name") ?: "Unknown1"
+                                                Log.d("Firebase", "Most recent finished patient: ${previousPatientActive.text}")
+
+                                                // Update UI
+                                                fetchQueueData() // Refresh UI
+                                            }
+                                            .addOnFailureListener { e ->
+                                                previousPatientActive.text = "Unknown"
+                                                Log.d("Firebase", "Error fetching patient name", e)
+                                            }
+                                    } else {
+                                        previousPatientActive.text = "None"
+                                        Log.d("Firebase", "No finished patients found")
+                                    }
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("Firebase", "Error fetching finished patient", e)
+                                    Toast.makeText(this, "Error fetching finished patient", Toast.LENGTH_SHORT).show()
+                                }
                         } else {
                             Toast.makeText(this, "No more patients in queue", Toast.LENGTH_SHORT).show()
                             currentlyServingActive.text = "None"
